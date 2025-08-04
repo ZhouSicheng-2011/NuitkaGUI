@@ -163,7 +163,19 @@ class NuitkaGUI:
     def imports_tab(self):
         self.tab_2 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_2, text='导入选项')
-        ...
+        #
+        self.f_3 = ttk.Labelframe(self.tab_2, text='包含包', labelanchor='nw')
+        self.f_3.place(x=20, y=20, width=600, height=540)
+        #
+        self.follow_imports = tk.IntVar(value=1)
+        self.cbtn_1 = ttk.Checkbutton(self.f_3, text='递归处理导入模块', offvalue=0, onvalue=1)
+        self.cbtn_1.grid(column=0, columnspan=2, row=0, sticky='w')
+        #
+        self.follow_stdlib = tk.IntVar(value=1)
+        self.cbtn_2 = ttk.Checkbutton(self.f_3, text='递归处理标准库导入', offvalue=0, onvalue=1)
+        self.cbtn_2.grid(column=0, columnspan=2, row=1, sticky='w')
+        ##
+        self.lb_3 = ttk.Label(self.f_3)#...
 
     def onefile_tab(self):
         self.tab_3 = ttk.Frame(self.notebook)
