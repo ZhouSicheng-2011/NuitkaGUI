@@ -161,7 +161,9 @@ class NuitkaGUI:
         pass
 
     def imports_tab(self):
-        pass
+        self.tab_2 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_2, text='导入选项')
+        ...
 
     def onefile_tab(self):
         self.tab_3 = ttk.Frame(self.notebook)
