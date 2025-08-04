@@ -105,48 +105,56 @@ class NuitkaGUI:
         self.f_0.place(x=20,y=20,width=600,height=500)
         self.mode = tk.StringVar(value='accelerated')
         #
-        self.rbtn_0 = ttk.Radiobutton(self.f_0, text='依赖Python解释器模式', variable=self.mode)
+        self.rbtn_0 = ttk.Radiobutton(self.f_0, text='依赖Python解释器模式', variable=self.mode, value='accelerated')
         self.rbtn_0.bind('<<RadioButtonSelected>>', lambda event: self.mode.set('accelerated'))
-        self.rbtn_0.pack()
+        self.rbtn_0.pack(anchor='w', fill='y')
         #
-        self.rbtn_1 = ttk.Radiobutton(self.f_0, text='独立文件夹模式', variable=self.mode)
+        self.rbtn_1 = ttk.Radiobutton(self.f_0, text='独立文件夹模式', variable=self.mode, value='standalone')
         self.rbtn_1.bind('<<RadioButtonSelected>>', lambda event: self.mode.set('standalone'))
-        self.rbtn_1.pack()
+        self.rbtn_1.pack(anchor='w', fill='y')
         #
-        self.rbtn_2 = ttk.Radiobutton(self.f_0, text='单文件模式', variable=self.mode)
+        self.rbtn_2 = ttk.Radiobutton(self.f_0, text='单文件模式', variable=self.mode, value='onefile')
         self.rbtn_2.bind('<<RadioButtonSelected>>', lambda event: self.mode.set('onefile'))
         #这里以后要处理标签页，暂时跳过
-        self.rbtn_2.pack()
+        self.rbtn_2.pack(anchor='w', fill='y')
         #
-        self.rbtn_3 = ttk.Radiobutton(self.f_0, text='APP模式', variable=self.mode)
+        self.rbtn_3 = ttk.Radiobutton(self.f_0, text='APP模式', variable=self.mode, value='app')
         self.rbtn_3.bind('<<RadioButtonSelected>>', lambda event: self.mode.set('app'))
-        self.rbtn_3.pack()
+        self.rbtn_3.pack(anchor='w', fill='y')
         #
-        self.rbtn_4 = ttk.Radiobutton(self.f_0, text='二进制动态模块模式', variable=self.mode)
+        self.rbtn_4 = ttk.Radiobutton(self.f_0, text='二进制动态模块模式', variable=self.mode, value='module')
         self.rbtn_4.bind('<<RadioButtonSelected>>', lambda event: self.mode.set('module'))
-        self.rbtn_4.pack()
+        self.rbtn_4.pack(anchor='w', fill='y')
         #
-        self.rbtn_5 = ttk.Radiobutton(self.f_0, text='二进制动态包模式', variable=self.mode)
+        self.rbtn_5 = ttk.Radiobutton(self.f_0, text='二进制动态包模式', variable=self.mode, value='package')
         self.rbtn_5.bind('<<RadioButtonSelected>>', lambda event: self.mode.set('package'))
-        self.rbtn_5.pack()
+        self.rbtn_5.pack(anchor='w', fill='y')
         #
-        self.rbtn_6 = ttk.Radiobutton(self.f_0, text='动态链接库模式', variable=self.mode)
+        self.rbtn_6 = ttk.Radiobutton(self.f_0, text='动态链接库模式', variable=self.mode, value='dll')
         self.rbtn_6.bind('<<RadioButtonSelected>>', lambda event: self.mode.set('dll'))
-        self.rbtn_6.pack()
+        self.rbtn_6.pack(anchor='w', fill='y')
         ##
         ##
         self.py_flags = ['isolated','main','no_asserts','no_docstrings','no_site',\
                          'no_warnings','safe_path','static_hashes','unbuffered','dont_write_bytecode']
-        self.f_1 = ttk.LabelFrame(self.tab_0, text='Python标志')
-        self.f_1.place(x=620,y=20,width=600,height=160)
+        self.f_1 = ttk.LabelFrame(self.tab_0, text='Python标志', labelanchor='nw')
+        self.f_1.place(x=620,y=20,width=600,height=280)
         #
-        self.lb_2 = ttk.Label(self.f_1, text='Python标志')
+        self.lb_2 = ttk.Label(self.f_1, text='Python标志:')
         self.lb_2.grid(column=0, row=0)
         #
         self.py_flag = tk.StringVar(value='no_site')
         self.cbox_0 = ttk.Combobox(self.f_1, values=self.py_flags, state='readonly')
         self.cbox_0.bind('<<ComboboxSelected>>', lambda event: self.py_flag.set(self.cbox_0.get()))
-        ...
+        self.cbox_0.grid(column=1, row=0)
+        ##
+        ##
+        self.f_2 = ttk.Labelframe(self.tab_0, text='调试选项', labelanchor='nw')
+        self.f_2.place(x=620, y=320, width=600,height=280)
+        #
+        self.py_dbg = tk.IntVar(value=0)
+        self.cbtn_0 = ttk.Checkbutton(self.f_2, text='Python Debug', offvalue=0, onvalue=1)
+        self.cbtn_0.pack(anchor='w', fill='y')
         
 
     def package_tab(self):
@@ -213,7 +221,7 @@ class NuitkaGUI:
         self.notebook.add(self.tab_16, text='Test')
         self.btn_test = ttk.Button(self.tab_16, text='Test',\
                                    command=self.test)
-        self.btn_test.pack()
+        self.btn_test.pack(anchor='w', fill='y')
     '''
 
     def status(self):
