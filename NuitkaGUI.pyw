@@ -137,6 +137,15 @@ class NuitkaGUI:
         ##
         self.py_flags = ['isolated','main','no_asserts','no_docstrings','no_site',\
                          'no_warnings','safe_path','static_hashes','unbuffered','dont_write_bytecode']
+        self.f_1 = ttk.LabelFrame(self.tab_0, text='Python标志')
+        self.f_1.place(x=620,y=20,width=600,height=160)
+        #
+        self.lb_2 = ttk.Label(self.f_1, text='Python标志')
+        self.lb_2.grid(column=0, row=0)
+        #
+        self.py_flag = tk.StringVar(value='no_site')
+        self.cbox_0 = ttk.Combobox(self.f_1, values=self.py_flags, state='readonly')
+        self.cbox_0.bind('<<ComboboxSelected>>', lambda event: self.py_flag.set(self.cbox_0.get()))
         ...
         
 
