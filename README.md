@@ -9,7 +9,7 @@ Nuitka的GUI打包工具
 **硬盘空间:** 至少剩余5GB，如果需要MSVC编译器则应当15GB以上
 
 ### 操作系统
-目前仅支持 **Windows** 和 **Linux** 
+目前仅支持 **Windows 10及以上** 和 **Linux** 
 ### 必要程序
 **Python解释器:** Python **3.4-3.13** ，在自由线程解释器成熟前不建议使用，下载链接：[Python官方网站下载页面](https://www.python.org/downloads/)
 
