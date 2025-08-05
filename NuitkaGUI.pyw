@@ -175,7 +175,19 @@ class NuitkaGUI:
         self.cbtn_2 = ttk.Checkbutton(self.f_3, text='递归处理标准库导入', offvalue=0, onvalue=1)
         self.cbtn_2.grid(column=0, columnspan=2, row=1, sticky='w')
         ##
-        self.lb_3 = ttk.Label(self.f_3)#...
+        self.lb_3 = ttk.Label(self.f_3, text='递归处理导入库:')
+        self.lb_3.grid(column=0, row=2, sticky='w')
+        #
+        self.pkg_name_1 = tk.StringVar()
+        self.e_2 = ttk.Entry(self.f_3, state='normal', textvariable=self.pkg_name_1)
+        self.e_2.grid(column=1, columnspan=2 ,row=2)
+        #
+        self.btn_2 = ttk.Button(self.f_3, text='添加库')#...
+        self.btn_2.grid(column=3, row=2)
+        #
+        self.scr_0 = ttk.Scrollbar(self.f_3, command=self.lbox_0.yview)
+        self.lbox_0 = tk.Listbox(self.f_3, activestyle='dotbox',yscrollcommand=self.scr_0.set,\
+                                 selectmode='extended')#...
 
     def onefile_tab(self):
         self.tab_3 = ttk.Frame(self.notebook)
