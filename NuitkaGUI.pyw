@@ -196,7 +196,17 @@ class NuitkaGUI:
         self.lbox_0.pack(side='left', fill='both')
         self.scr_0.pack(side='right', fill='both')
         #^
-        self.btn_2.config(command=lambda:self.lbox_0.insert(tk.END, self.pkg_name_1.get()))
+        self.follow_imports_list = []
+        self.btn_2.config(command=lambda:self.insert(self.lbox_0, self.pkg_name_1.get(),self.follow_imports_list))
+        self.btn_3.config(command=lambda:self.delete_selection(self.lbox_0))
+        ##
+        ##
+        self.f_5 = ttk.Labelframe(self.tab_2, text='不包含库', labelanchor='nw')
+        self.f_5.place(x=640, y=20, width=600, height=540)
+        #
+        self.no_follow_imports = tk.IntVar(value=0)
+        self.cbtn_3 = ttk.Checkbutton(self.f_5, text='不递归处理一切导入库(覆盖所有包含选项)')
+        ...
 
     def onefile_tab(self):
         self.tab_3 = ttk.Frame(self.notebook)
@@ -333,6 +343,17 @@ class NuitkaGUI:
         t = threading.Thread(target=self.run_command,args=('ping 8.8.8.8',),daemon=True)
         t.start()
     '''
+
+    def delete_selection(self, listbox:tk.Listbox):
+        selection = listbox.curselection()
+        if selection:
+            listbox.delete(selection)
+        else:
+            messagebox.showwarning(title='警告', message='没有选中的项目!')
+    
+    def insert(self, listbox:tk.Listbox, content:str, cache:list):
+        listbox.insert(tk.END, content)
+        cache.append(content)
 
 
 
