@@ -179,7 +179,7 @@ class NuitkaGUI:
         self.lb_3.grid(column=0, row=2, sticky='w')
         #
         self.pkg_name_1 = tk.StringVar()
-        self.e_2 = ttk.Entry(self.f_3, state='normal', textvariable=self.pkg_name_1)
+        self.e_2 = ttk.Entry(self.f_3, state='normal', textvariable=self.pkg_name_1, width=40)
         self.e_2.grid(column=1, columnspan=2 ,row=2)
         #
         self.btn_2 = ttk.Button(self.f_3, text='添加库')#...
@@ -188,11 +188,15 @@ class NuitkaGUI:
         self.btn_3 = ttk.Button(self.f_3, text='删除选中库')#...
         self.btn_3.grid(column=4, row=2)
         #
-        self.f_4 = ttk.Frame(self.f_3)
+        self.f_4 = ttk.Labelframe(self.f_3, text='包含库列表', labelanchor='nw')
         self.f_4.grid(column=0, row=3, columnspan=5, rowspan=5)
-        self.scr_0 = ttk.Scrollbar(self.f_4, command=self.lbox_0.yview)
-        self.lbox_0 = tk.Listbox(self.f_4, activestyle='dotbox',yscrollcommand=self.scr_0.set)#,\
-                                 #selectmode='extended')#...
+        self.lbox_0 = tk.Listbox(self.f_4, activestyle='dotbox')
+        self.scr_0 = tk.Scrollbar(self.f_4, command=self.lbox_0.yview)
+        self.lbox_0.config(yscrollcommand=self.scr_0.set)
+        self.lbox_0.pack(side='left', fill='both')
+        self.scr_0.pack(side='right', fill='both')
+        #^
+        self.btn_2.config(command=lambda:self.lbox_0.insert(tk.END, self.pkg_name_1.get()))
 
     def onefile_tab(self):
         self.tab_3 = ttk.Frame(self.notebook)
