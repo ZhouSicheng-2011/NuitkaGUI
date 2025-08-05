@@ -168,11 +168,11 @@ class NuitkaGUI:
         self.f_3.place(x=20, y=20, width=600, height=540)
         #
         self.follow_imports = tk.IntVar(value=1)
-        self.cbtn_1 = ttk.Checkbutton(self.f_3, text='递归处理导入模块', offvalue=0, onvalue=1)
+        self.cbtn_1 = ttk.Checkbutton(self.f_3, text='递归处理导入模块(推荐)', offvalue=0, onvalue=1)
         self.cbtn_1.grid(column=0, columnspan=2, row=0, sticky='w')
         #
         self.follow_stdlib = tk.IntVar(value=1)
-        self.cbtn_2 = ttk.Checkbutton(self.f_3, text='递归处理标准库导入', offvalue=0, onvalue=1)
+        self.cbtn_2 = ttk.Checkbutton(self.f_3, text='递归处理标准库导入(推荐)', offvalue=0, onvalue=1)
         self.cbtn_2.grid(column=0, columnspan=2, row=1, sticky='w')
         ##
         self.lb_3 = ttk.Label(self.f_3, text='递归处理导入库:')
@@ -205,8 +205,34 @@ class NuitkaGUI:
         self.f_5.place(x=640, y=20, width=600, height=540)
         #
         self.no_follow_imports = tk.IntVar(value=0)
-        self.cbtn_3 = ttk.Checkbutton(self.f_5, text='不递归处理一切导入库(覆盖所有包含选项)')
-        ...
+        self.cbtn_3 = ttk.Checkbutton(self.f_5, text='不递归处理一切导入库(覆盖所有包含选项)(不推荐)',\
+                                      variable=self.no_follow_imports, offvalue=0, onvalue=1)
+        self.cbtn_3.grid(column=0, columnspan=2, row=0, sticky='w')
+        #
+        self.lb_4 = ttk.Label(self.f_5, text='不递归处理导入库')
+        self.lb_4.grid(column=0, row=1)
+        #
+        self.pkg_name_2 = tk.StringVar(value='')
+        self.e_3 = ttk.Entry(self.f_5, width=40, textvariable=self.pkg_name_2, state='normal')
+        self.e_3.grid(column=1, columnspan=2, row=1)
+        #
+        self.btn_4 = ttk.Button(self.f_5, text='添加库')
+        self.btn_4.grid(column=3, row=1)
+        #
+        self.btn_5 = ttk.Button(self.f_5, text='删除选中库')
+        self.btn_5.grid(column=4, row=1)
+        #^
+        self.f_6 = ttk.Labelframe(self.f_5, text='不包含库列表', labelanchor='nw')
+        self.f_6.grid(column=0, row=2, columnspan=5, rowspan=5)
+        self.lbox_1 = tk.Listbox(self.f_6, activestyle='dotbox')
+        self.scr_1 = tk.Scrollbar(self.f_6, command=self.lbox_1.yview)
+        self.lbox_1.config(yscrollcommand=self.scr_1.set)
+        self.lbox_1.pack(side='left', fill='both')
+        self.scr_1.pack(side='left', fill='both')
+        #^
+        self.no_follow_imports_list = []
+        self.btn_4.config(command=lambda:self.insert(self.lbox_1, self.pkg_name_2.get(), self.no_follow_imports_list))
+        self.btn_5.config(command=lambda:self.delete_selection(self.lbox_1))
 
     def onefile_tab(self):
         self.tab_3 = ttk.Frame(self.notebook)
