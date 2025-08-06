@@ -262,7 +262,40 @@ class NuitkaGUI:
         pass
 
     def debug_tab(self):
-        pass
+        self.tab_10 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_10, text='调试选项')
+        #
+        self.f_10 = ttk.Labelframe(self.tab_10, text='调试性选项(不建议)')
+        self.f_10.place(x=20, y=20, width=1220, height=160)
+        #
+        self.debug = tk.IntVar(value=0)
+        self.cbtn_4 = ttk.Checkbutton(self.f_10, variable=self.debug, offvalue=0, onvalue=1,\
+                                      text='执行所有可能的自检以查错')
+        self.cbtn_4.pack(anchor='w', fill='y')
+        #
+        self.unstripped = tk.IntVar(value=0)
+        self.cbtn_5 = ttk.Checkbutton(self.f_10, variable=self.unstripped, offvalue=0,\
+                                      onvalue=1, text='在结果对象文件中保留调试信息')
+        self.cbtn_5.pack(anchor='w', fill='y')
+        #
+        self.trace_execution = tk.IntVar(value=0)
+        self.cbtn_6 = ttk.Checkbutton(self.f_10, variable=self.trace_execution, offvalue=0,\
+                                      onvalue=1, text='跟踪执行输出(执行前输出代码行)')
+        self.cbtn_6.pack(anchor='w', fill='y')
+        ##
+        ##
+        self.f_11 = ttk.Labelframe(self.tab_10, text='调试与优化')
+        self.f_11.place(x=20, y=200, width=1220, height=200)
+        #
+        self.lb_6 = ttk.Label(self.f_11, text='将优化结果与程序结构写入的XML文件:')
+        self.lb_6.grid(column=0, row=0)
+        #
+        self.xml_filename = tk.StringVar()
+        self.e_5 = ttk.Entry(self.f_11, textvariable=self.xml_filename, width=70)
+        self.e_5.grid(column=1, row=0)
+        #
+        self.btn_7 = ttk.Button(self.f_11, text='浏览', command=self.select_xml)
+        self.btn_7.grid(column=2, row=0)
 
     def C_compiler_tab(self):
         pass
@@ -485,6 +518,10 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
     def browse_user_plugin(self):
         f = filedialog.askopenfilename()
         self.user_plugin.set(f)
+
+    def select_xml(self):
+        f = filedialog.asksaveasfilename(filetypes=[('XML文件', '*.xml')])
+        self.xml_filename.set(f)
 
 
 
