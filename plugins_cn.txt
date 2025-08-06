@@ -1,0 +1,30 @@
+anti-bloat 精简优化：从广泛使用的库模块源代码中移除不必要的导入。
+data-files 数据文件：根据包配置文件包含指定的数据文件。
+delvewheel delvewheel 支持：在独立模式下支持使用 delvewheel 的包所必需。
+dill-compat dill 兼容性：为 'dill' 包和 'cloudpickle' 提供兼容性支持所必需。
+dll-files DLL 文件：根据包配置文件包含 DLL 文件。
+enum-compat 枚举兼容性：为 Python2 和 'enum' 包提供兼容性支持所必需。
+eventlet eventlet 支持：支持包含 'eventlet' 依赖项及其对 'dns' 包进行动态补丁的需求。
+gevent gevent 支持：为 'gevent' 包所必需。
+gi GI (GObject Introspection) 支持：支持 GI 包的 typelib 依赖。
+glfw glfw 支持：在独立模式下为 'OpenGL' (PyOpenGL) 和 'glfw' 包所必需。
+implicit-imports 隐式导入：根据包配置文件提供包的隐式导入。
+kivy Kivy 支持：为 'kivy' 包所必需。
+matplotlib Matplotlib 支持：为 'matplotlib' 模块所必需。
+multiprocessing 多进程支持：为 Python 的 'multiprocessing' 模块所必需。
+no-qt 禁用 Qt：禁止包含所有 Qt 绑定库。
+options-nanny 选项保姆：根据包配置文件，向用户提示潜在问题。
+pbr-compat pbr 兼容性：在独立模式下为 'pbr' 包所必需。
+pkg-resources pkg_resources 支持：为 'pkg_resources' 提供解决方案。
+playwright Playwright 支持：为 'playwright' 包所必需。
+pmw-freezer Pmw 支持：为 'Pmw' 包所必需。
+pylint-warnings PyLint 警告支持：支持 PyLint / PyDev 的源代码标记。
+pyqt5 PyQt5 支持：为 PyQt5 包所必需。
+pyqt6 PyQt6 支持：在独立模式下为 PyQt6 包所必需。
+pyside2 PySide2 支持：为 PySide2 包所必需。
+pyside6 PySide6 支持：在独立模式下为 PySide6 包所必需。
+pywebview Webview 支持：为 'webview' 包 (PyPI 上的 pywebview) 所必需。
+spacy spaCy 支持：为 'spacy' 包所必需。
+tk-inter Tkinter 支持：为 Python 的 Tk 模块所必需。
+transformers Transformers 支持：为 transformers 包提供隐式导入。
+upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。

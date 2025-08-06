@@ -353,14 +353,29 @@ pywebview Webview 支持：为 'webview' 包 (PyPI 上的 pywebview) 所必需�
 spacy spaCy 支持：为 'spacy' 包所必需。
 tk-inter Tkinter 支持：为 Python 的 Tk 模块所必需。
 transformers Transformers 支持：为 transformers 包提供隐式导入。
-upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。"""
+upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
+========================================================================"""
+        #
         self.f_8 = ttk.Labelframe(self.tab_14, text='用户插件', labelanchor='nw')
         self.f_8.place(x=20, y=240, width=1220, height=100)
         self.lb_5 = ttk.Label(self.f_8, text='用户插件路径')
         self.lb_5.grid(column=0, row=0)
+        #
         self.user_plugin = tk.StringVar(value='')
-        self.e_4 = ttk.Entry(self.f_8, textvariable=self.user_plugin)
-        
+        self.e_4 = ttk.Entry(self.f_8, textvariable=self.user_plugin, width=100)
+        self.e_4.grid(column=1, columnspan=2, row=0)
+        #
+        self.btn_6 = ttk.Button(self.f_8, text='浏览', command=self.browse_user_plugin)
+        self.btn_6.grid(column=3, row=0)
+        ##
+        ##
+        self.f_9 = ttk.Labelframe(self.tab_14, text='标准插件帮助', labelanchor='nw')
+        self.f_9.place(x=20, y=360, width=1220, height=200)
+        #
+        self.stxt_0 = scrolledtext.ScrolledText(self.f_9, font=tkinter.font.Font(family='Consolas', size=12))
+        self.stxt_0.pack(fill='both', expand=True)
+        self.stxt_0.insert(tk.END, self.help_plugin)
+        self.stxt_0.config(state='disabled')
 
     def console_tab(self):
         self.tab_15 = ttk.Frame(self.notebook)
@@ -466,6 +481,10 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。"""
     def insert(self, listbox:tk.Listbox, content:str, cache:list):
         listbox.insert(tk.END, content)
         cache.append(content)
+    
+    def browse_user_plugin(self):
+        f = filedialog.askopenfilename()
+        self.user_plugin.set(f)
 
 
 
