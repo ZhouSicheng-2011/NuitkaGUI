@@ -190,7 +190,7 @@ class NuitkaGUI:
         #
         self.f_4 = ttk.Labelframe(self.f_3, text='包含库列表', labelanchor='nw')
         self.f_4.grid(column=0, row=3, columnspan=5, rowspan=5)
-        self.lbox_0 = tk.Listbox(self.f_4, activestyle='dotbox')
+        self.lbox_0 = tk.Listbox(self.f_4, activestyle='dotbox', width=60)
         self.scr_0 = tk.Scrollbar(self.f_4, command=self.lbox_0.yview)
         self.lbox_0.config(yscrollcommand=self.scr_0.set)
         self.lbox_0.pack(side='left', fill='both')
@@ -224,7 +224,7 @@ class NuitkaGUI:
         #^
         self.f_6 = ttk.Labelframe(self.f_5, text='不包含库列表', labelanchor='nw')
         self.f_6.grid(column=0, row=2, columnspan=5, rowspan=5)
-        self.lbox_1 = tk.Listbox(self.f_6, activestyle='dotbox')
+        self.lbox_1 = tk.Listbox(self.f_6, activestyle='dotbox', width=60)
         self.scr_1 = tk.Scrollbar(self.f_6, command=self.lbox_1.yview)
         self.lbox_1.config(yscrollcommand=self.scr_1.set)
         self.lbox_1.pack(side='left', fill='both')
@@ -304,14 +304,24 @@ class NuitkaGUI:
         "spacy",
         "tk-inter",
         "transformers",
-        "upx"]
+        "upx"] #30 items,6 columns,5 rows
         #
         self.tab_14 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_14, text='插件选项')
         #
         self.f_7 = ttk.Labelframe(self.tab_14, text='启用插件', labelanchor='nw')
         self.f_7.place(x=20, y=20, width=1220, height=400)
-        ...
+        #
+        self.ctrl_group_2 = dict()
+        self.var_group_2 = dict()
+        for i in range(30):
+            p = self.plugins[i]
+            self.var_group_2[p] = tk.IntVar(value=0)
+            self.ctrl_group_2[p] = ttk.Checkbutton(self.f_7, variable=self.var_group_2[p],\
+                                                   offvalue=0, onvalue=1, text=p)
+            row = i % 5
+            col = i % 6
+            self.ctrl_group_2[p].grid(column=col, row=row, sticky='w')
         
 
     def console_tab(self):
