@@ -139,14 +139,14 @@ class NuitkaGUI:
                          'no_warnings','safe_path','static_hashes','unbuffered','dont_write_bytecode']
         self.f_1 = ttk.LabelFrame(self.tab_0, text='Python标志', labelanchor='nw')
         self.f_1.place(x=620,y=20,width=600,height=280)
-        #
-        self.lb_2 = ttk.Label(self.f_1, text='Python标志:')
-        self.lb_2.grid(column=0, row=0)
-        #
-        self.py_flag = tk.StringVar(value='no_site')
-        self.cbox_0 = ttk.Combobox(self.f_1, values=self.py_flags, state='readonly')
-        self.cbox_0.bind('<<ComboboxSelected>>', lambda event: self.py_flag.set(self.cbox_0.get()))
-        self.cbox_0.grid(column=1, row=0)
+        self.py_flag = []
+        self.ctrl_group_1 = dict()
+        self.var_group_1 = dict()
+        for f in self.py_flags:
+            self.var_group_1[f] = tk.IntVar(value=0)
+            self.ctrl_group_1[f] = ttk.Checkbutton(self.f_1, variable=self.var_group_1[f],\
+                                                   offvalue=0, onvalue=1, text=f)
+            self.ctrl_group_1[f].pack(anchor='w', fill='y')
         ##
         ##
         self.f_2 = ttk.Labelframe(self.tab_0, text='调试选项', labelanchor='nw')
@@ -274,7 +274,45 @@ class NuitkaGUI:
         pass
 
     def plugin_tab(self):
-        pass
+        self.plugins = [
+        "anti-bloat",
+        "data-files",
+        "delvewheel",
+        "dill-compat",
+        "dll-files",
+        "enum-compat",
+        "eventlet",
+        "gevent",
+        "gi",
+        "glfw",
+        "implicit-imports",
+        "kivy",
+        "matplotlib",
+        "multiprocessing",
+        "no-qt",
+        "options-nanny",
+        "pbr-compat",
+        "pkg-resources",
+        "playwright",
+        "pmw-freezer",
+        "pylint-warnings",
+        "pyqt5",
+        "pyqt6",
+        "pyside2",
+        "pyside6",
+        "pywebview",
+        "spacy",
+        "tk-inter",
+        "transformers",
+        "upx"]
+        #
+        self.tab_14 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_14, text='插件选项')
+        #
+        self.f_7 = ttk.Labelframe(self.tab_14, text='启用插件', labelanchor='nw')
+        self.f_7.place(x=20, y=20, width=1220, height=400)
+        ...
+        
 
     def console_tab(self):
         self.tab_15 = ttk.Frame(self.notebook)
