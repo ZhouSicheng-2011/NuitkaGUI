@@ -259,7 +259,14 @@ class NuitkaGUI:
         pass
 
     def deployment_tab(self):
-        pass
+        self.tab_9 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_9, text='部署选项')
+        #
+        self.deployment = tk.IntVar(value=0)
+        self.rbtn_7 = ttk.Radiobutton(self.tab_9, text='禁用使查找兼容性问题更容易的代码',\
+                                      value=2, variable=self.deployment)
+        self.rbtn_7.grid(column=0, row=0)
+        ...
 
     def debug_tab(self):
         self.tab_10 = ttk.Frame(self.notebook)
@@ -296,6 +303,11 @@ class NuitkaGUI:
         #
         self.btn_7 = ttk.Button(self.f_11, text='浏览', command=self.select_xml)
         self.btn_7.grid(column=2, row=0)
+        #
+        self.low_memory = tk.IntVar(value=1)
+        self.cbtn_7 = ttk.Checkbutton(self.f_11, variable=self.low_memory, offvalue=0,\
+                                      onvalue=1, text='降低内存用量')
+        self.cbtn_7.grid(column=0, row=2, sticky='w')
 
     def C_compiler_tab(self):
         pass
