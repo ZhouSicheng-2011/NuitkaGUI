@@ -12,7 +12,6 @@ import sys
 
 #多线程处理相关模块
 import threading
-import queue
 
 #相关模块
 import os
@@ -28,8 +27,10 @@ class NuitkaGUI:
         self.root.title('Nuitka打包工具')
         self.root.geometry('1300x900+50+50')
 
+        self.theme = 'vista' if platform.system()=='Windows' else 'clam'
+
         self.style = ttk.Style()
-        self.style.theme_use('vista')
+        self.style.theme_use(self.theme)
         self.style.configure("TNotebook", background="#f0f0f0")
         self.style.configure("TNotebook.Tab", padding=(10, 5), font=('Consolas', 10))
         self.style.configure("TFrame", background="#f0f0f0")
@@ -40,6 +41,7 @@ class NuitkaGUI:
         self.style.configure("TCheckbutton", background="#f0f0f0", font=('Consolas', 10))
         self.style.configure("TRadiobutton", background="#f0f0f0", font=('Consolas', 10))
         self.style.configure("TListbox", font=('Consolas', 10))
+        self.style.configure("TSpinbox", font=('Consolas', 10))
         
         self.main = ttk.LabelFrame(self.root,labelanchor='nw',text='基础选项')
         self.main.place(x=20,y=20,width=1260,height=160)
@@ -342,9 +344,10 @@ class NuitkaGUI:
                                        text='Clang编译器')
         self.rbtn_11.pack(anchor='w', fill='y')
         self.rbtn_12 = ttk.Radiobutton(self.f_12, variable=self.C_complier, value='msvc',\
-                                       text='MSVC编译器')
+                                       text='MSVC编译器(下面填写版本)')
+        self.rbtn_12.pack(anchor='w', fill='y')
         self.cbox_0 = ttk.Combobox(self.f_12, values=['latest'], state='normal')
-        self.cbox_0.pack(anchor='center', fill='y')
+        self.cbox_0.pack(anchor='w', fill='y')
         #
         self.f_13 = ttk.Labelframe(self.tab_11, text='加速与优化', labelanchor='nw')
         self.f_13.place(x=20, y=300, width=1220, height=260)
@@ -357,7 +360,12 @@ class NuitkaGUI:
         self.sbox_0.grid(column=1, row=0)
         #
         self.lb_9 = ttk.Label(self.f_13, text='链接时优化')
-        ...
+        self.lb_9.grid(column=0, row=2)
+        #
+        self.lto = tk.StringVar(value='yes')
+        self.cbox_1 = ttk.Combobox(self.f_13, values=['yes','no','auto'], state='readonly')
+        self.cbox_1.bind('<<ComboboxSelected>>', lambda event:self.lto.set(self.cbox_1.get()))
+        self.cbox_1.grid(column=1, row=2)
 
     def OS_tab(self):
         pass
