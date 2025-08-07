@@ -343,7 +343,20 @@ class NuitkaGUI:
         self.rbtn_11.pack(anchor='w', fill='y')
         self.rbtn_12 = ttk.Radiobutton(self.f_12, variable=self.C_complier, value='msvc',\
                                        text='MSVC编译器')
-        self.cbox_0 = ttk.Combobox(self.f_12, values=['latest'])
+        self.cbox_0 = ttk.Combobox(self.f_12, values=['latest'], state='normal')
+        self.cbox_0.pack(anchor='center', fill='y')
+        #
+        self.f_13 = ttk.Labelframe(self.tab_11, text='加速与优化', labelanchor='nw')
+        self.f_13.place(x=20, y=300, width=1220, height=260)
+        #
+        self.lb_8 = ttk.Label(self.f_13, text='并行编译作业数')
+        self.lb_8.grid(column=0, row=0)
+        #self.jobs_values = ...
+        self.jobs = tk.StringVar()
+        self.sbox_0 = ttk.Spinbox(self.f_13, from_=1-os.cpu_count(), to=os.cpu_count(), textvariable=self.jobs) # type: ignore
+        self.sbox_0.grid(column=1, row=0)
+        #
+        self.lb_9 = ttk.Label(self.f_13, text='链接时优化')
         ...
 
     def OS_tab(self):
