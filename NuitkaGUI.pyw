@@ -334,7 +334,17 @@ class NuitkaGUI:
         self.f_12 = ttk.LabelFrame(self.tab_11, text='C编译器', labelanchor='nw')
         self.f_12.place(x=20, y=20, width=1220, height=260)
         #
-        
+        self.C_complier = tk.StringVar(value='mingw64')
+        self.rbtn_10 = ttk.Radiobutton(self.f_12, variable=self.C_complier, value='mingw64',\
+                                       text='MinGW64编译器')
+        self.rbtn_10.pack(anchor='w', fill='y')
+        self.rbtn_11 = ttk.Radiobutton(self.f_12, variable=self.C_complier, value='clang',\
+                                       text='Clang编译器')
+        self.rbtn_11.pack(anchor='w', fill='y')
+        self.rbtn_12 = ttk.Radiobutton(self.f_12, variable=self.C_complier, value='msvc',\
+                                       text='MSVC编译器')
+        self.cbox_0 = ttk.Combobox(self.f_12, values=['latest'])
+        ...
 
     def OS_tab(self):
         pass
