@@ -368,7 +368,17 @@ class NuitkaGUI:
         self.cbox_1.grid(column=1, row=2)
 
     def OS_tab(self):
-        pass
+        self.tab_12 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_12, text='系统选项')
+        #
+        self.f_14 = ttk.LabelFrame(self.tab_12, text='Windows选项')
+        self.f_14.place(x=20, y=20, width=1220, height=360)
+        #
+        self.windows_uac_admin = tk.IntVar(value=0)
+        self.cbtn_8 = ttk.Checkbutton(self.f_14, variable=self.windows_uac_admin, offvalue=0,\
+                                      onvalue=1, text='向Windows用户账户控制请求管理员权限')
+        self.cbtn_8.pack(anchor='w', fill='y')
+        ...
 
     def info_tab(self):
         pass
