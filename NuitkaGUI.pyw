@@ -265,8 +265,27 @@ class NuitkaGUI:
         self.deployment = tk.IntVar(value=0)
         self.rbtn_7 = ttk.Radiobutton(self.tab_9, text='禁用使查找兼容性问题更容易的代码',\
                                       value=2, variable=self.deployment)
-        self.rbtn_7.grid(column=0, row=0)
-        ...
+        self.rbtn_7.grid(column=0, row=0, sticky='w')
+        #
+        self.rbtn_8 = ttk.Radiobutton(self.tab_9, variable=self.deployment, value=1,\
+                                      text='保持部署模式但禁用部分功能')
+        self.rbtn_8.grid(column=0, row=1, sticky='w')
+
+        self.lb_7 = ttk.Label(self.tab_9, text='禁用选项')
+        self.lb_7.grid(column=0, row=2)
+
+        self.no_deployment_flag = tk.StringVar()
+        self.e_6 = ttk.Entry(self.tab_9, textvariable=self.no_deployment_flag)
+        #self.e_6.config(state='disabled')
+        self.e_6.grid(column=1, row=2, sticky='w')
+
+        self.rbtn_8.bind('<<RadioButtonSelected>>', lambda event:self.e_6.config(state='normal'))
+        self.rbtn_7.bind('<<RadioButtonSelected>>', lambda event:self.e_6.config(state='disabled'))
+        #
+        self.rbtn_9 = ttk.Radiobutton(self.tab_9, variable=self.deployment, value=0,\
+                                      text='不进行处理')
+        self.rbtn_9.bind('<<RadioButtonSelected>>', lambda event:self.e_6.config(state='disabled'))
+        self.rbtn_9.grid(column=0, row=3, sticky='w')
 
     def debug_tab(self):
         self.tab_10 = ttk.Frame(self.notebook)
@@ -310,7 +329,12 @@ class NuitkaGUI:
         self.cbtn_7.grid(column=0, row=2, sticky='w')
 
     def C_compiler_tab(self):
-        pass
+        self.tab_11 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_11, text='C编译器选项')
+        self.f_12 = ttk.LabelFrame(self.tab_11, text='C编译器', labelanchor='nw')
+        self.f_12.place(x=20, y=20, width=1220, height=260)
+        #
+        
 
     def OS_tab(self):
         pass
