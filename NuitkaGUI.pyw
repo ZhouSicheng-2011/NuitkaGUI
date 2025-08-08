@@ -377,12 +377,37 @@ class NuitkaGUI:
         self.windows_uac_admin = tk.IntVar(value=0)
         self.cbtn_8 = ttk.Checkbutton(self.f_14, variable=self.windows_uac_admin, offvalue=0,\
                                       onvalue=1, text='向Windows用户账户控制请求管理员权限')
-        self.cbtn_8.pack(anchor='w', fill='y')
+        self.cbtn_8.place(x=20, y=20 ,width=600, height=40)
+        #
+        self.f_15 = ttk.Labelframe(self.f_14, text='控制台模式', labelanchor='nw')
+        self.f_15.place(x=20, y=80, width=600, height=260)
         self.windows_console_mode = tk.StringVar(value='force')
         self.wincm = {'force':'执行时跳出控制台',
                       'disable':'禁用控制台',
                       'attach':'从命令行启动时控制台附加到原控制台, 双击启动无控制台',
-                      'hide':'控制台会被创建, 但会被最小化, 中途可能突然跳出一下'}
+                      'hide':'控制台会被创建, 但会被最小化, 中途可能突然跳出'}
+        self.ctrl_group_3 = dict()
+        for k in self.wincm.keys():
+            self.ctrl_group_3[k] = ttk.Radiobutton(self.f_15, value=k, text=self.wincm[k],\
+                                                   variable=self.windows_console_mode)
+            self.ctrl_group_3[k].pack(anchor='w', fill='y')
+
+        ##
+        ##
+        self.f_16 = ttk.Labelframe(self.f_14, text='Windows应用程序ICO图标', labelanchor='nw')
+        self.f_16.place(x=640, y=20, width=600, height=320)
+        #
+        self.lb_10 = ttk.Label(self.f_16, text='ICO图标路径:')
+        self.lb_10.grid(column=0, row=0)
+        #
+        self.windows_icon_from_ico = []
+        self.win_ico_path = tk.StringVar(value='')
+        self.e_7 = ttk.Entry(self.f_16, textvariable=self.win_ico_path, state='readonly',\
+                             width=50)
+        self.e_7.grid(column=1, columnspan=2, row=0)
+        #
+        self.btn_8 = ttk.Button(self.f_16, text='浏览', command=lambda:self.select_ico(self.win_ico_path))
+        ...
 
     def info_tab(self):
         pass
@@ -603,6 +628,10 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
     def select_xml(self):
         f = filedialog.asksaveasfilename(filetypes=[('XML文件', '*.xml')])
         self.xml_filename.set(f)
+
+    def select_ico(self, var:tk.StringVar):
+        f = filedialog.askopenfilename(filetypes=[('ICO图标文件','*.ico')])
+        var.set(f)
 
 
 
