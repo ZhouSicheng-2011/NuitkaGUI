@@ -378,7 +378,11 @@ class NuitkaGUI:
         self.cbtn_8 = ttk.Checkbutton(self.f_14, variable=self.windows_uac_admin, offvalue=0,\
                                       onvalue=1, text='向Windows用户账户控制请求管理员权限')
         self.cbtn_8.pack(anchor='w', fill='y')
-        ...
+        self.windows_console_mode = tk.StringVar(value='force')
+        self.wincm = {'force':'执行时跳出控制台',
+                      'disable':'禁用控制台',
+                      'attach':'从命令行启动时控制台附加到原控制台, 双击启动无控制台',
+                      'hide':'控制台会被创建, 但会被最小化, 中途可能突然跳出一下'}
 
     def info_tab(self):
         pass
