@@ -377,10 +377,10 @@ class NuitkaGUI:
         self.windows_uac_admin = tk.IntVar(value=0)
         self.cbtn_8 = ttk.Checkbutton(self.f_14, variable=self.windows_uac_admin, offvalue=0,\
                                       onvalue=1, text='向Windows用户账户控制请求管理员权限')
-        self.cbtn_8.place(x=20, y=20 ,width=600, height=40)
+        self.cbtn_8.place(x=20, y=20 ,width=500, height=40)
         #
         self.f_15 = ttk.Labelframe(self.f_14, text='控制台模式', labelanchor='nw')
-        self.f_15.place(x=20, y=80, width=600, height=260)
+        self.f_15.place(x=20, y=80, width=540, height=260)
         self.windows_console_mode = tk.StringVar(value='force')
         self.wincm = {'force':'执行时跳出控制台',
                       'disable':'禁用控制台',
@@ -395,19 +395,36 @@ class NuitkaGUI:
         ##
         ##
         self.f_16 = ttk.Labelframe(self.f_14, text='Windows应用程序ICO图标', labelanchor='nw')
-        self.f_16.place(x=640, y=20, width=600, height=320)
+        self.f_16.place(x=580, y=20, width=600, height=320)
         #
         self.lb_10 = ttk.Label(self.f_16, text='ICO图标路径:')
-        self.lb_10.grid(column=0, row=0)
+        self.lb_10.place(x=0, y=10, width=80, height=40)
         #
         self.windows_icon_from_ico = []
-        self.win_ico_path = tk.StringVar(value='')
+        self.win_ico_path = tk.StringVar()
         self.e_7 = ttk.Entry(self.f_16, textvariable=self.win_ico_path, state='readonly',\
-                             width=50)
-        self.e_7.grid(column=1, columnspan=2, row=0)
+                             width=40)
+        self.e_7.place(x=90, y=15, width=200, height=35)
         #
-        self.btn_8 = ttk.Button(self.f_16, text='浏览', command=lambda:self.select_ico(self.win_ico_path))
-        ...
+        self.btn_8 = ttk.Button(self.f_16, text='浏览', command=self.select_ico)
+        self.btn_8.place(x=300, y=15, width=60, height=35)
+        #
+        self.btn_10 = ttk.Button(self.f_16, text='插入', command=lambda:self.insert(self.lbox_2, self.win_ico_path.get(), self.windows_icon_from_ico))
+        self.btn_10.place(x=370, y=15, width=60, height=35)
+        #
+        self.btn_9 = ttk.Button(self.f_16, text='删除选中', command=lambda:self.delete_selection(self.lbox_2))
+        self.btn_9.place(x=450, y=15, width=140, height=35)
+        #
+        self.f_17 = ttk.Frame(self.f_16)
+        self.f_17.place(x=10, y=50, width=580, height=300)
+        #
+        self.lbox_2 = tk.Listbox(self.f_17, activestyle='dotbox')
+        self.scr_2 = ttk.Scrollbar(self.f_17, command=self.lbox_2.yview, orient='vertical')
+        self.scr_3 = ttk.Scrollbar(self.f_17, command=self.lbox_2.xview, orient='horizontal')
+        self.lbox_2.configure(xscrollcommand=self.scr_3.set, yscrollcommand=self.scr_2.set)
+        self.lbox_2.place(x=0, y=0, width=560, height=200)
+        self.scr_2.place(x=580, y=0, width=20, height=200)
+        self.scr_3.place(x=0, y=200, width=560, height=20)
 
     def info_tab(self):
         pass
@@ -442,8 +459,8 @@ class NuitkaGUI:
         "pywebview",
         "spacy",
         "tk-inter",
-        "transformers",
-        "upx"] #30 items,6 columns,5 rows
+        "transformers"]
+        #29 items,6 columns,5 rows
         #
         self.tab_14 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_14, text='插件选项')
@@ -453,7 +470,7 @@ class NuitkaGUI:
         #
         self.ctrl_group_2 = dict()
         self.var_group_2 = dict()
-        for i in range(30):
+        for i in range(29):
             p = self.plugins[i]
             self.var_group_2[p] = tk.IntVar(value=0)
             self.ctrl_group_2[p] = ttk.Checkbutton(self.f_7, variable=self.var_group_2[p],\
@@ -629,9 +646,9 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
         f = filedialog.asksaveasfilename(filetypes=[('XML文件', '*.xml')])
         self.xml_filename.set(f)
 
-    def select_ico(self, var:tk.StringVar):
-        f = filedialog.askopenfilename(filetypes=[('ICO图标文件','*.ico')])
-        var.set(f)
+    def select_ico(self):
+        f = filedialog.askopenfilename(filetypes=[('ICO图标文件', '*.ico')])
+        self.win_ico_path.set(f)
 
 
 
