@@ -425,9 +425,37 @@ class NuitkaGUI:
         self.lbox_2.place(x=0, y=0, width=560, height=200)
         self.scr_2.place(x=580, y=0, width=20, height=200)
         self.scr_3.place(x=0, y=200, width=560, height=20)
+        ##
+        ##
+        self.f_18 = ttk.Labelframe(self.tab_12, text='Linux选项', labelanchor='nw')
+        self.f_18.place(x=20, y=400, width=1220, height=100)
+        #
+        self.lb_2 = ttk.Label(self.f_18, text='Linux单文件图标')
+        self.lb_2.grid(column=0, row=0)
+        #
+        self.e_8 = ttk.Entry(self.f_18) #...
 
     def info_tab(self):
-        pass
+        self.tab_13 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_13, text='版本信息')
+        #
+        self.explain_0 = {'company_name':'版本信息中公司名称',
+                          'product_name':'版本信息中产品名称',
+                          'file_version':'版本信息中文件版本',
+                          'product_version':'版本信息中产品版本',
+                          'copyright_text':'版本信息中版权信息'}
+        self.ctrl_group_4 = dict()
+        self.ctrl_group_5 = dict()
+        self.var_group_3 = dict()
+        n = 0
+        for exp in self.explain_0.keys():
+            self.var_group_3[exp] = tk.StringVar()
+            self.ctrl_group_5[exp] = ttk.Label(self.tab_13, text=self.explain_0[exp])
+            self.ctrl_group_5[exp].grid(column=0, row=n, padx=10, pady=10)
+            self.ctrl_group_4[exp] = ttk.Entry(self.tab_13, textvariable=self.var_group_3[exp],\
+                                               width=100)
+            self.ctrl_group_4[exp].grid(column=1, row=n, padx=10, pady=10)
+            n += 1
 
     def plugin_tab(self):
         self.plugins = [

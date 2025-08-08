@@ -8,7 +8,7 @@ Nuitka的GUI打包工具
 
 **硬盘空间:** 至少剩余5GB，如果需要MSVC编译器则应当20GB以上
 
-**网络:**需要流畅的Internet连接
+**网络:** 需要流畅的Internet连接
 
 ### 操作系统
 目前仅支持 **Windows 10 及以上** 和 **Linux** 
