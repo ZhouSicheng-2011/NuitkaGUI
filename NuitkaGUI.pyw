@@ -262,6 +262,12 @@ class NuitkaGUI:
                                        offvalue=False, onvalue=True, text='启用编译时检测到的异常代码警告')
         #
         self.assume_yes_for_downloads = tk.BooleanVar(value=True)
+        self.cbtn_15 = ttk.Checkbutton(self.tab_6, variable=self.assume_yes_for_downloads,\
+                                       offvalue=False, onvalue=True, text='允许Nuitka在必要时下载外部代码(主要是编译器及其依赖)')
+        self.cbtn_15.bind('<<Toggled>>', lambda event:self.disable_or_enable_download())
+        #
+        self.nowarn_mnemonic = tk.StringVar(value='')
+        ...
 
     def run_tab(self):
         self.tab_6 = ttk.Frame(self.notebook)
@@ -742,12 +748,22 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
         result = messagebox.askyesnocancel(title='您确定吗', message=message, icon='warning')
         if result == True:
             raw = var.get()
-            if raw == 1:
-                var.set(0) # type: ignore
-            elif raw == 0:
-                var.set(1) # type: ignore
-            elif isinstance(raw, bool):
-                var.set(raw)#...
+            match raw:
+                case True:
+                    var.set(False)
+                case False:
+                    var.set(True)
+                case 1:
+                    var.set(0) # type: ignore
+                case 0:
+                    var.set(1) # type: ignore
+    
+    def disable_or_enable_download(self):
+        r = self.assume_yes_for_downloads.get()
+        if r:
+            self.ask_before_do(message='确定禁止Nuitka下载必要代码吗', var=self.assume_yes_for_downloads)
+        else:
+            self.assume_yes_for_downloads.set(True)
 
 
 
