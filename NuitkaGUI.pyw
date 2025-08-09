@@ -252,7 +252,8 @@ class NuitkaGUI:
         pass
 
     def run_tab(self):
-        pass
+        self.tab_6 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_6, text='运行选项')
 
     def compile_tab(self):
         pass
@@ -262,11 +263,31 @@ class NuitkaGUI:
         self.notebook.add(self.tab_8, text='输出控制')
         #
         self.remove_output = tk.IntVar(value=1)
-        self.cbtn_9 = ttk.Checkbutton(self.tab_8, text='编译完成后输出中间文件',\
+        self.cbtn_9 = ttk.Checkbutton(self.tab_8, text='编译完成后删除中间文件',\
                                       variable=self.remove_output, offvalue=0, onvalue=1)
-        self.cbtn_9.grid(column=0, row=0, columnspan=2)
+        self.cbtn_9.grid(column=0, row=0, columnspan=2, sticky='w')
         #
         self.no_pyi_file = tk.IntVar(value=0)
+        self.cbtn_10 = ttk.Checkbutton(self.tab_8, variable=self.no_pyi_file, offvalue=0,\
+                                       onvalue=1, text='不为扩展模块创建pyi文件')
+        self.cbtn_10.grid(column=0, row=1, columnspan=2, sticky='w')
+        #
+        self.lb_11 = ttk.Label(self.tab_8, text='可执行文件名:')
+        self.lb_11.grid(column=0, row=3)
+        #
+        self.output_filename = tk.StringVar(value='')
+        self.e_9 = ttk.Entry(self.tab_8, textvariable=self.output_filename, width=100)
+        self.e_9.grid(column=1, row=3, columnspan=2)
+        ##
+        self.lb_12 = ttk.Label(self.tab_8, text='输出文件目录:')
+        self.lb_12.grid(column=0, row=4)
+        #
+        self.output_dir = tk.StringVar(value='')
+        self.e_10 = ttk.Entry(self.tab_8, textvariable=self.output_dir, width=100)
+        self.e_10.grid(column=1, row=4, columnspan=2)
+        #
+        self.btn_12 = ttk.Button(self.tab_8, text='浏览', command=self.select_save_dir)
+        self.btn_12.grid(column=3, row=4)
 
     def deployment_tab(self):
         self.tab_9 = ttk.Frame(self.notebook)
@@ -340,7 +361,7 @@ class NuitkaGUI:
 
     def C_compiler_tab(self):
         self.tab_11 = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_11, text='C编译器选项')
+        self.notebook.add(self.tab_11, text='C编译器')
         self.f_12 = ttk.LabelFrame(self.tab_11, text='C编译器', labelanchor='nw')
         self.f_12.place(x=20, y=20, width=1220, height=260)
         #
@@ -360,18 +381,18 @@ class NuitkaGUI:
         self.f_13 = ttk.Labelframe(self.tab_11, text='加速与优化', labelanchor='nw')
         self.f_13.place(x=20, y=300, width=1220, height=260)
         #
-        self.lb_8 = ttk.Label(self.f_13, text='并行编译作业数')
-        self.lb_8.grid(column=0, row=0)
+        self.lb_8 = ttk.Label(self.f_13, text='并行编译作业数(先点击一下按钮才能调节)')
+        self.lb_8.grid(column=0, row=0, sticky='w')
         #self.jobs_values = ...
         self.jobs = tk.StringVar()
         self.sbox_0 = ttk.Spinbox(self.f_13, from_=1-os.cpu_count(), to=os.cpu_count(), textvariable=self.jobs) # type: ignore
         self.sbox_0.grid(column=1, row=0)
         #
-        self.lb_9 = ttk.Label(self.f_13, text='链接时优化')
-        self.lb_9.grid(column=0, row=2)
+        self.lb_9 = ttk.Label(self.f_13, text='链接时优化(可进一步防反汇编)')
+        self.lb_9.grid(column=0, row=2, sticky='w')
         #
         self.lto = tk.StringVar(value='yes')
-        self.cbox_1 = ttk.Combobox(self.f_13, values=['yes','no','auto'], state='readonly')
+        self.cbox_1 = ttk.Combobox(self.f_13, values=['yes','no','auto'], state='readonly', width=19)
         self.cbox_1.bind('<<ComboboxSelected>>', lambda event:self.lto.set(self.cbox_1.get()))
         self.cbox_1.grid(column=1, row=2)
 
@@ -690,6 +711,10 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
     def select_ico(self):
         f = filedialog.askopenfilename(filetypes=[('ICO图标文件', '*.ico')])
         self.win_ico_path.set(f)
+    
+    def select_save_dir(self):
+        f = filedialog.askdirectory()
+        self.output_dir.set(f)
 
 
 
