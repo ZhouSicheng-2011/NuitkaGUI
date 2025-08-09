@@ -249,11 +249,24 @@ class NuitkaGUI:
         pass
 
     def warn_tab(self):
-        pass
+        self.tab_5 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_5, text='警告控制')
+        #
+        ...
 
     def run_tab(self):
         self.tab_6 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_6, text='运行选项')
+        #
+        self.run = tk.BooleanVar(value=False)
+        self.cbtn_11 = ttk.Checkbutton(self.tab_6, variable=self.run, offvalue=False,\
+                                       onvalue=True, text='编译后立即执行')
+        self.cbtn_11.pack(anchor='w', fill='y')
+        #
+        self.debugger = tk.BooleanVar(value=False)
+        self.cbtn_12 = ttk.Checkbutton(self.tab_6, variable=self.debugger, offvalue=False,\
+                                       onvalue=True, text='调试器中运行(自动选择gdb/lldb)')
+        self.cbtn_12.pack(anchor='w', fill='y')
 
     def compile_tab(self):
         pass
