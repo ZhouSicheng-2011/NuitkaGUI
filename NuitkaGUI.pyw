@@ -258,7 +258,15 @@ class NuitkaGUI:
         pass
 
     def output_tab(self):
-        pass
+        self.tab_8 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_8, text='输出控制')
+        #
+        self.remove_output = tk.IntVar(value=1)
+        self.cbtn_9 = ttk.Checkbutton(self.tab_8, text='编译完成后输出中间文件',\
+                                      variable=self.remove_output, offvalue=0, onvalue=1)
+        self.cbtn_9.grid(column=0, row=0, columnspan=2)
+        #
+        self.no_pyi_file = tk.IntVar(value=0)
 
     def deployment_tab(self):
         self.tab_9 = ttk.Frame(self.notebook)
@@ -404,7 +412,7 @@ class NuitkaGUI:
         self.win_ico_path = tk.StringVar()
         self.e_7 = ttk.Entry(self.f_16, textvariable=self.win_ico_path, state='readonly',\
                              width=40)
-        self.e_7.place(x=90, y=15, width=200, height=35)
+        self.e_7.place(x=90, y=15, width=200, height=30)
         #
         self.btn_8 = ttk.Button(self.f_16, text='浏览', command=self.select_ico)
         self.btn_8.place(x=300, y=15, width=60, height=35)
@@ -430,10 +438,15 @@ class NuitkaGUI:
         self.f_18 = ttk.Labelframe(self.tab_12, text='Linux选项', labelanchor='nw')
         self.f_18.place(x=20, y=400, width=1220, height=100)
         #
-        self.lb_2 = ttk.Label(self.f_18, text='Linux单文件图标')
+        self.lb_2 = ttk.Label(self.f_18, text='Linux单文件图标:')
         self.lb_2.grid(column=0, row=0)
         #
-        self.e_8 = ttk.Entry(self.f_18) #...
+        self.linux_icon = tk.StringVar(value='')
+        self.e_8 = ttk.Entry(self.f_18, textvariable=self.linux_icon, width=100, state='readonly')
+        self.e_8.grid(column=1, row=0)
+        #
+        self.btn_11 = ttk.Button(self.f_18, text='浏览', command=self.select_ico)
+        self.btn_11.grid(column=2, row=0)
 
     def info_tab(self):
         self.tab_13 = ttk.Frame(self.notebook)
