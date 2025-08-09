@@ -252,7 +252,16 @@ class NuitkaGUI:
         self.tab_5 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_5, text='警告控制')
         #
-        ...
+        self.warn_implicit_exception = tk.BooleanVar(value=False)
+        self.cbtn_13 = ttk.Checkbutton(self.tab_6, variable=self.warn_implicit_exception,\
+                                       offvalue=False, onvalue=True, text='启用编译时隐式异常警告')
+        self.cbtn_13.grid(column=0, row=0, sticky='w')
+        #
+        self.warn_unusual_code = tk.BooleanVar(value=False)
+        self.cbtn_14 = ttk.Checkbutton(self.tab_6, variable=self.warn_unusual_code,\
+                                       offvalue=False, onvalue=True, text='启用编译时检测到的异常代码警告')
+        #
+        self.assume_yes_for_downloads = tk.BooleanVar(value=True)
 
     def run_tab(self):
         self.tab_6 = ttk.Frame(self.notebook)
@@ -728,6 +737,17 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
     def select_save_dir(self):
         f = filedialog.askdirectory()
         self.output_dir.set(f)
+    
+    def ask_before_do(self, message:str, var:tk.IntVar | tk.BooleanVar):
+        result = messagebox.askyesnocancel(title='您确定吗', message=message, icon='warning')
+        if result == True:
+            raw = var.get()
+            if raw == 1:
+                var.set(0) # type: ignore
+            elif raw == 0:
+                var.set(1) # type: ignore
+            elif isinstance(raw, bool):
+                var.set(raw)#...
 
 
 
