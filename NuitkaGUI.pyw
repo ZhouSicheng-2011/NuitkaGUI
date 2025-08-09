@@ -253,21 +253,28 @@ class NuitkaGUI:
         self.notebook.add(self.tab_5, text='警告控制')
         #
         self.warn_implicit_exception = tk.BooleanVar(value=False)
-        self.cbtn_13 = ttk.Checkbutton(self.tab_6, variable=self.warn_implicit_exception,\
+        self.cbtn_13 = ttk.Checkbutton(self.tab_5, variable=self.warn_implicit_exception,\
                                        offvalue=False, onvalue=True, text='启用编译时隐式异常警告')
-        self.cbtn_13.grid(column=0, row=0, sticky='w')
+        self.cbtn_13.grid(column=0, row=0, sticky='w', columnspan=2)
         #
         self.warn_unusual_code = tk.BooleanVar(value=False)
-        self.cbtn_14 = ttk.Checkbutton(self.tab_6, variable=self.warn_unusual_code,\
+        self.cbtn_14 = ttk.Checkbutton(self.tab_5, variable=self.warn_unusual_code,\
                                        offvalue=False, onvalue=True, text='启用编译时检测到的异常代码警告')
+        self.cbtn_14.grid(column=0, row=1, sticky='w', columnspan=2)
         #
         self.assume_yes_for_downloads = tk.BooleanVar(value=True)
-        self.cbtn_15 = ttk.Checkbutton(self.tab_6, variable=self.assume_yes_for_downloads,\
+        self.cbtn_15 = ttk.Checkbutton(self.tab_5, #variable=self.assume_yes_for_downloads,\
+                                       command=self.disable_or_enable_download,\
                                        offvalue=False, onvalue=True, text='允许Nuitka在必要时下载外部代码(主要是编译器及其依赖)')
-        self.cbtn_15.bind('<<Toggled>>', lambda event:self.disable_or_enable_download())
+        ###self.cbtn_15.bind('<<Toggled>>', lambda event:self.disable_or_enable_download())
+        self.cbtn_15.grid(column=0, row=2, sticky='w', columnspan=2)
         #
         self.nowarn_mnemonic = tk.StringVar(value='')
-        ...
+        self.lb_13 = ttk.Label(self.tab_5, text='禁用特定助记符的警告:')
+        self.lb_13.grid(column=0, row=3)
+        #
+        self.e_11 = ttk.Entry(self.tab_5, textvariable=self.nowarn_mnemonic)
+        self.e_11.grid(column=1, row=3)
 
     def run_tab(self):
         self.tab_6 = ttk.Frame(self.notebook)
@@ -744,27 +751,13 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
         f = filedialog.askdirectory()
         self.output_dir.set(f)
     
-    def ask_before_do(self, message:str, var:tk.IntVar | tk.BooleanVar):
-        result = messagebox.askyesnocancel(title='您确定吗', message=message, icon='warning')
-        if result == True:
-            raw = var.get()
-            match raw:
-                case True:
-                    var.set(False)
-                case False:
-                    var.set(True)
-                case 1:
-                    var.set(0) # type: ignore
-                case 0:
-                    var.set(1) # type: ignore
-    
     def disable_or_enable_download(self):
-        r = self.assume_yes_for_downloads.get()
-        if r:
-            self.ask_before_do(message='确定禁止Nuitka下载必要代码吗', var=self.assume_yes_for_downloads)
+        if self.assume_yes_for_downloads.get():
+            r = messagebox.askyesno(title='确认', message='禁止Nuitka在必要时下载外部代码(主要是编译器及其依赖)吗?')
+            if r:
+                self.assume_yes_for_downloads.set(False)
         else:
             self.assume_yes_for_downloads.set(True)
-
 
 
 if __name__=='__main__':
