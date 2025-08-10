@@ -1,0 +1,1 @@
+C:\Users\ADMINI~1\AppData\Local\Nuitka\Nuitka\Cache\DOWNLO~1\gcc\x86_64\14.2.0posix-19.1.1-12.0.0-msvcrt-r2

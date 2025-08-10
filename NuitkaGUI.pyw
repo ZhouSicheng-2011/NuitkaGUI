@@ -240,13 +240,44 @@ class NuitkaGUI:
         self.tab_3 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_3, text='单文件选项')
         #setattr(self.tab_3, 'id', 'onefile')
+        #
+        self.onefile_no_compression = tk.BooleanVar(value=False)
+        self.cbtn_10 = ttk.Checkbutton(self.tab_3, variable=self.onefile_no_compression,\
+                                        offvalue=False, onvalue=True, text='不压缩单文件包')
+        self.cbtn_10.grid(column=0, row=1, sticky='w', columnspan=2)
         ...
+        #
+        self.onefile_tempdir_spec = tk.StringVar(value='')
+        self.lb_19 = ttk.Label(self.tab_3, text='单文件临时目录:')
+        self.lb_19.grid(column=0, row=0)
 
     def data_tab(self):
         pass
 
     def dll_tab(self):
-        pass
+        self.tab_4 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_4, text='DLL选项')
+        #
+        self.noinclude_dlls = tk.StringVar(value='')
+        self.lb_5 = ttk.Label(self.tab_4, text='不包含DLL列表:')
+        self.lb_5.grid(column=0, row=0, sticky='e')
+        #
+        self.e_13 = ttk.Entry(self.tab_4, textvariable=self.noinclude_dlls, width=100)
+        self.e_13.grid(column=1, row=0)
+        #
+        self.list_package_dlls = tk.StringVar(value='')
+        self.lb_17 = ttk.Label(self.tab_4, text='列出包所包含的DLL:')
+        self.lb_17.grid(column=0, row=1, sticky='e')
+        #
+        self.e_14 = ttk.Entry(self.tab_4, textvariable=self.list_package_dlls, width=100)
+        self.e_14.grid(column=1, row=1)
+        #
+        self.list_package_exe = tk.StringVar(value='')
+        self.lb_18 = ttk.Label(self.tab_4, text='列出包所包含的EXE:')
+        self.lb_18.grid(column=0, row=2, sticky='e')
+        #
+        self.e_15 = ttk.Entry(self.tab_4, textvariable=self.list_package_exe, width=100)
+        self.e_15.grid(column=1, row=2)
 
     def warn_tab(self):
         self.tab_5 = ttk.Frame(self.notebook)
@@ -291,7 +322,40 @@ class NuitkaGUI:
         self.cbtn_12.pack(anchor='w', fill='y')
 
     def compile_tab(self):
-        pass
+        self.tab_7 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_7, text='编译选项')
+        #
+        self.full_compat = tk.BooleanVar(value=False)
+        self.cbtn_16 = ttk.Checkbutton(self.tab_7, variable=self.full_compat, offvalue=False,\
+                                       onvalue=True, text='启用完全兼容CPython模式(测试)')
+        self.cbtn_16.grid(column=0, row=0, sticky='w', columnspan=2)
+        #
+        self.lb_14 = ttk.Label(self.tab_7, text='选择__file__变量的值:')
+        self.lb_14.grid(column=0, row=1, sticky='e')
+        self.file_reference_choice = tk.StringVar(value='runtime')
+        self.cbox_2 = ttk.Combobox(self.tab_7, values=['runtime','original','frozen'],\
+                                   state='readonly', width=20)
+        self.cbox_2.bind('<<ComboboxSelected>>', lambda event:self.file_reference_choice.set(self.cbox_2.get()))
+        self.cbox_2.grid(column=1, row=1, sticky='w')
+        #
+        self.lb_15 = ttk.Label(self.tab_7, text='选择__name__变量和__package__变量的值:')
+        self.lb_15.grid(column=0, row=2, sticky='e')
+        self.module_name_choice = tk.StringVar(value='runtime')
+        self.cbox_3 = ttk.Combobox(self.tab_7, values=['runtime', 'original'],\
+                                    state='readonly', width=20)
+        self.cbox_3.bind('<<ComboboxSelected>>', lambda event:self.module_name_choice.set(self.cbox_3.get()))
+        self.cbox_3.grid(column=1, row=2, sticky='w')
+        #
+        self.user_package_configuration = tk.StringVar(value='')
+        self.lb_16 = ttk.Label(self.tab_7, text='用户包配置YAML文件路径:')
+        self.lb_16.grid(column=0, row=3)
+        #
+        self.e_12 = ttk.Entry(self.tab_7, textvariable=self.user_package_configuration,\
+                              width=100, state='readonly')
+        self.e_12.grid(column=1, row=3, columnspan=5)
+        #
+        self.btn_13 = ttk.Button(self.tab_7, text='浏览', command=self.select_yaml_file)
+        self.btn_13.grid(column=6, row=3)
 
     def output_tab(self):
         self.tab_8 = ttk.Frame(self.notebook)
@@ -758,6 +822,10 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
                 self.assume_yes_for_downloads.set(False)
         else:
             self.assume_yes_for_downloads.set(True)
+
+    def select_yaml_file(self):
+        f = filedialog.askopenfilename(filetypes=[('YAML文件', '*.yml;*.yaml')])
+        self.user_package_configuration.set(f)
 
 
 if __name__=='__main__':
