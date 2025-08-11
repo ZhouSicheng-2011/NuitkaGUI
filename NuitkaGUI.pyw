@@ -160,7 +160,8 @@ class NuitkaGUI:
         
 
     def package_tab(self):
-        pass
+        self.tab_1 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_1, text='包含包选项')
 
     def imports_tab(self):
         self.tab_2 = ttk.Frame(self.notebook)
@@ -275,6 +276,11 @@ class NuitkaGUI:
         self.cbox_4.grid(column=1, row=5, sticky='w')
         #
         self.onefile_child_grace = tk.IntVar(value=5000)
+        self.lb_21 = ttk.Label(self.tab_3, text='单文件子进程终止等待时间(毫秒):')
+        self.lb_21.grid(column=0, row=6)
+        #
+        self.sbox_1 = ttk.Spinbox(self.tab_3, from_=0, to=30_000, increment=500, textvariable=self.onefile_child_grace)
+        self.sbox_1.grid(column=1, row=6, sticky='w')
 
     def data_tab(self):
         pass
