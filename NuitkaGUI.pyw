@@ -245,11 +245,36 @@ class NuitkaGUI:
         self.cbtn_10 = ttk.Checkbutton(self.tab_3, variable=self.onefile_no_compression,\
                                         offvalue=False, onvalue=True, text='不压缩单文件包')
         self.cbtn_10.grid(column=0, row=1, sticky='w', columnspan=2)
-        ...
+        #
+        self.onefile_as_archive = tk.BooleanVar(value=False)
+        self.cbtn_12 = ttk.Checkbutton(self.tab_3, variable=self.onefile_as_archive,\
+                                        offvalue=False, onvalue=True,\
+                                            text='创建可以使用nuitka-onefile-unapck解包的归档格式')
+        self.cbtn_12.grid(column=0, row=2, sticky='w', columnspan=2)
+        #
+        self.onefile_no_dll = tk.BooleanVar(value=False)
+        self.cbtn_14 = ttk.Checkbutton(self.tab_3, variable=self.onefile_no_dll,\
+                                        offvalue=False, onvalue=True,\
+                                            text='不使用DLL文件在运行之前解压, 使用EXE解压')
+        self.cbtn_14.grid(column=0, row=3, sticky='w', columnspan=2)
         #
         self.onefile_tempdir_spec = tk.StringVar(value='')
         self.lb_19 = ttk.Label(self.tab_3, text='单文件临时目录:')
-        self.lb_19.grid(column=0, row=0)
+        self.lb_19.grid(column=0, row=4)
+        #
+        self.e_16 = ttk.Entry(self.tab_3, textvariable=self.onefile_tempdir_spec, width=100)
+        self.e_16.grid(column=1, row=4, columnspan=4)
+        #
+        self.onefile_cache_mode = tk.StringVar(value='auto')
+        self.lb_20 = ttk.Label(self.tab_3, text='单文件缓存模式:')
+        self.lb_20.grid(column=0, row=5)
+        #
+        self.cbox_4 = ttk.Combobox(self.tab_3, values=['auto','tempdir','userdir'],\
+                                      state='readonly', width=20)
+        self.cbox_4.bind('<<ComboboxSelected>>', lambda event:self.onefile_cache_mode.set(self.cbox_4.get()))
+        self.cbox_4.grid(column=1, row=5, sticky='w')
+        #
+        self.onefile_child_grace = tk.IntVar(value=5000)
 
     def data_tab(self):
         pass
