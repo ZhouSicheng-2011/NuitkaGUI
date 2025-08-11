@@ -162,6 +162,45 @@ class NuitkaGUI:
     def package_tab(self):
         self.tab_1 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_1, text='包含包选项')
+        #
+        self.prefer_source_code = tk.BooleanVar(value=False)
+        self.cbtn_17 = ttk.Checkbutton(self.tab_1, text='优先使用源代码而不是已经编译的扩展模块',\
+                                       variable=self.prefer_source_code, offvalue=False,\
+                                        onvalue=True)
+        self.cbtn_17.place(x=20, y=20, width=1220, height=30)
+        ##
+        ##
+        self.include_package = []
+        self.include_module = []
+        self.include_plugin_directory = []
+        self.include_plugin_files = []
+        #
+        self.includes = {'include_package':(20, 60),\
+                     'include_module':(640, 60),\
+                        'include_plugin_directory':(20, 320),\
+                         'include_plugin_files':(640, 320)}
+        #
+        self.explain_1 = {'include_package':'包含整个包',\
+                     'include_module':'包含单个模块',\
+                        'include_plugin_directory':'包含插件目录',\
+                         'include_plugin_files':'包含插件文件'}
+        #
+        self.var_group_4 = dict()
+        self.ctrl_group_5 = dict()
+        #
+        for k in self.includes.keys():
+            self.var_group_4[k] = tk.StringVar(value='')
+            self.ctrl_group_5[k] = []
+            self.ctrl_group_5[k].append(ttk.Frame(self.tab_1))
+            self.ctrl_group_5[k][0].place(x=self.includes[k][0], y=self.includes[k][1], width=600, height=240)
+            #
+            self.ctrl_group_5[k].append(ttk.Label(self.ctrl_group_5[k], text=f'{self.explain_1[k]}:'))
+            self.ctrl_group_5[k][1].place(x=10, y=10, width=80, height=30)
+            #
+            self.ctrl_group_5[k].append(ttk.Entry(self.ctrl_group_5[k][0],\
+                                                  textvariable=self.var_group_4[k]))
+            self.ctrl_group_5[k][2].place(x=100, y=10, width=480, height=25)
+            #...
 
     def imports_tab(self):
         self.tab_2 = ttk.Frame(self.notebook)
@@ -200,7 +239,7 @@ class NuitkaGUI:
         self.scr_0.pack(side='right', fill='both')
         #^
         self.follow_imports_list = []
-        self.btn_2.config(command=lambda:self.insert(self.lbox_0, self.pkg_name_1.get(),self.follow_imports_list))
+        self.btn_2.config(command=lambda:self.insert(self.lbox_0, self.pkg_name_1,self.follow_imports_list))
         self.btn_3.config(command=lambda:self.delete_selection(self.lbox_0))
         ##
         ##
@@ -234,7 +273,7 @@ class NuitkaGUI:
         self.scr_1.pack(side='left', fill='both')
         #^
         self.no_follow_imports_list = []
-        self.btn_4.config(command=lambda:self.insert(self.lbox_1, self.pkg_name_2.get(), self.no_follow_imports_list))
+        self.btn_4.config(command=lambda:self.insert(self.lbox_1, self.pkg_name_2, self.no_follow_imports_list))
         self.btn_5.config(command=lambda:self.delete_selection(self.lbox_1))
 
     def onefile_tab(self):
@@ -568,7 +607,7 @@ class NuitkaGUI:
         self.btn_8 = ttk.Button(self.f_16, text='浏览', command=self.select_ico)
         self.btn_8.place(x=300, y=15, width=60, height=35)
         #
-        self.btn_10 = ttk.Button(self.f_16, text='插入', command=lambda:self.insert(self.lbox_2, self.win_ico_path.get(), self.windows_icon_from_ico))
+        self.btn_10 = ttk.Button(self.f_16, text='插入', command=lambda:self.insert(self.lbox_2, self.win_ico_path, self.windows_icon_from_ico))
         self.btn_10.place(x=370, y=15, width=60, height=35)
         #
         self.btn_9 = ttk.Button(self.f_16, text='删除选中', command=lambda:self.delete_selection(self.lbox_2))
@@ -826,9 +865,10 @@ upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
         else:
             messagebox.showwarning(title='警告', message='没有选中的项目!')
     
-    def insert(self, listbox:tk.Listbox, content:str, cache:list):
-        listbox.insert(tk.END, content)
-        cache.append(content)
+    def insert(self, listbox:tk.Listbox, content:tk.StringVar, cache:list):
+        listbox.insert(tk.END, content.get())
+        cache.append(content.get())
+        content.set('')
     
     def browse_user_plugin(self):
         f = filedialog.askopenfilename()
