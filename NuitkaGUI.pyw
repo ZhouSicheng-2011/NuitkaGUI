@@ -408,6 +408,39 @@ class NuitkaGUI:
     def data_tab(self):
         self.tab_16 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_16, text='数据文件')
+        #
+        self.canvas = tk.Canvas(master=self.tab_16)
+        self.scr_4 = ttk.Scrollbar(self.tab_16, command=self.canvas.yview, orient='vertical')
+        self.canvas.configure(yscrollcommand=self.scr_4.set)
+        self.frame = ttk.Frame(self.canvas)
+        self.frame_id = self.canvas.create_window(0, 0, window=self.frame, anchor='nw')
+        self.frame.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox('all')))
+        self.canvas.bind('<Configure>', lambda e: self.canvas.itemconfig(self.frame_id, width=e.width))
+        self.canvas.bind_all('<MouseWheel>', self.on_mousewheel)
+        self.canvas.bind_all('<Button-4>', self.on_mousewheel)
+        self.canvas.bind_all('Button-5>', self.on_mousewheel)
+        self.canvas.pack(side='left', fill='both', expand=True)
+        self.canvas.pack(side='right', fill='y')
+        ###
+        ###
+        self.f_19 = ttk.Labelframe(self.frame, text='包含包数据文件', labelanchor='nw', width=1220, height=400)
+        self.f_19.place(x=20, y=20)
+        #
+        self.include_package_data = []
+        self.include_package_data_var = tk.StringVar(value='')
+        self.lb_22 = ttk.Label(self.f_19, text='包含包数据文件的包')
+        self.lb_22.place(x=10, y=10, width=150, height=30)
+        #
+        self.e_17 = ttk.Entry(self.f_19, textvariable=self.include_package_data_var, width=70)
+        self.e_17.place(x=170, y=15, width=800, height=25)
+        #
+        self.btn_14 = ttk.Button(self.f_19, text='添加')
+        self.btn_14.place(x=880, y=10, width=100, height=35)
+        #
+        self.btn_15 = ttk.Button(self.f_19, text='删除选中')
+        self.btn_15.place(x=990, y=10, width=100, height=35)
+        ##
+        self.lbox_3 = tk.Listbox(self.f_19, activestyle='dotbox')
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
@@ -769,34 +802,34 @@ class NuitkaGUI:
         self.plugin_buttons = {}
         
         # 第1列
-        self.plugin_vars["anti-bloat"] = tk.IntVar(value=0)
-        self.plugin_buttons["anti-bloat"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["anti-bloat"], text="anti-bloat")
-        self.plugin_buttons["anti-bloat"].grid(column=0, row=0, sticky='w', padx=5, pady=2)
+        self.anti_bloat = tk.IntVar(value=0)
+        self.cbtn_18 = ttk.Checkbutton(self.f_7, variable=self.anti_bloat, text="anti-bloat")
+        self.cbtn_18.grid(column=0, row=0, sticky='w', padx=5, pady=2)
         
-        self.plugin_vars["data-files"] = tk.IntVar(value=0)
-        self.plugin_buttons["data-files"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["data-files"], text="data-files")
-        self.plugin_buttons["data-files"].grid(column=0, row=1, sticky='w', padx=5, pady=2)
+        self.data_files = tk.IntVar(value=0)
+        self.cbtn_19 = ttk.Checkbutton(self.f_7, variable=self.data_files, text="data-files")
+        self.cbtn_19.grid(column=0, row=1, sticky='w', padx=5, pady=2)
         
-        self.plugin_vars["delvewheel"] = tk.IntVar(value=0)
-        self.plugin_buttons["delvewheel"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["delvewheel"], text="delvewheel")
-        self.plugin_buttons["delvewheel"].grid(column=0, row=2, sticky='w', padx=5, pady=2)
+        self.delvewheel = tk.IntVar(value=0)
+        self.cbtn_20 = ttk.Checkbutton(self.f_7, variable=self.delvewheel, text="delvewheel")
+        self.cbtn_20.grid(column=0, row=2, sticky='w', padx=5, pady=2)
         
-        self.plugin_vars["dill-compat"] = tk.IntVar(value=0)
-        self.plugin_buttons["dill-compat"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["dill-compat"], text="dill-compat")
-        self.plugin_buttons["dill-compat"].grid(column=0, row=3, sticky='w', padx=5, pady=2)
+        self.dill_compat = tk.IntVar(value=0)
+        self.cbtn_21 = ttk.Checkbutton(self.f_7, variable=self.dill_compat, text="dill-compat")
+        self.cbtn_21.grid(column=0, row=3, sticky='w', padx=5, pady=2)
         
-        self.plugin_vars["dll-files"] = tk.IntVar(value=0)
-        self.plugin_buttons["dll-files"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["dll-files"], text="dll-files")
-        self.plugin_buttons["dll-files"].grid(column=0, row=4, sticky='w', padx=5, pady=2)
+        self.dll_files = tk.IntVar(value=0)
+        self.cbtn_22 = ttk.Checkbutton(self.f_7, variable=self.dll_files, text="dll-files")
+        self.cbtn_22.grid(column=0, row=4, sticky='w', padx=5, pady=2)
         
         # 第2列
-        self.plugin_vars["enum-compat"] = tk.IntVar(value=0)
-        self.plugin_buttons["enum-compat"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["enum-compat"], text="enum-compat")
-        self.plugin_buttons["enum-compat"].grid(column=1, row=0, sticky='w', padx=5, pady=2)
+        self.enum_compat = tk.IntVar(value=0)
+        self.cbtn_23 = ttk.Checkbutton(self.f_7, variable=self.enum_compat, text="enum-compat")
+        self.cbtn_23.grid(column=1, row=0, sticky='w', padx=5, pady=2)
         
-        self.plugin_vars["eventlet"] = tk.IntVar(value=0)
-        self.plugin_buttons["eventlet"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["eventlet"], text="eventlet")
-        self.plugin_buttons["eventlet"].grid(column=1, row=1, sticky='w', padx=5, pady=2)
+        self.eventlet = tk.IntVar(value=0)
+        self.cbtn_24 = ttk.Checkbutton(self.f_7, variable=self.eventlet, text="eventlet")
+        self.cbtn_24.grid(column=1, row=1, sticky='w', padx=5, pady=2)
         
         self.plugin_vars["gevent"] = tk.IntVar(value=0)
         self.plugin_buttons["gevent"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["gevent"], text="gevent")
@@ -1077,6 +1110,13 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
     def select_yaml_file(self):
         f = filedialog.askopenfilename(filetypes=[('YAML文件', '*.yml;*.yaml')])
         self.user_package_configuration.set(f)
+    
+    def on_mousewheel(self, event):
+        """处理鼠标滚轮滚动"""
+        if event.num == 5 or event.delta == -120:  # 向下滚动
+            self.canvas.yview_scroll(1, "units")
+        if event.num == 4 or event.delta == 120:   # 向上滚动
+            self.canvas.yview_scroll(-1, "units")
 
 
 if __name__=='__main__':
