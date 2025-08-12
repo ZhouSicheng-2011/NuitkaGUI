@@ -32,7 +32,7 @@ class NuitkaGUI:
         self.style = ttk.Style()
         self.style.theme_use(self.theme)
         self.style.configure("TNotebook", background="#f0f0f0")
-        self.style.configure("TNotebook.Tab", padding=(10, 5), font=('Consolas', 10))
+        self.style.configure("TNotebook.Tab", padding=(5, 5), font=('Consolas', 10))
         self.style.configure("TFrame", background="#f0f0f0")
         self.style.configure("TButton", font=('Consolas', 10), padding=5)
         self.style.configure("TLabel", background="#f0f0f0", font=('Consolas', 10))
@@ -99,7 +99,7 @@ class NuitkaGUI:
         self.btn_0.grid(column=2, row=0)
         self.btn_1 = ttk.Button(self.main, text='浏览', command=self.select_interpreter)
         self.btn_1.grid(column=2,row=1)
-
+    
     def basic_tab(self):
         self.tab_0 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_0, text='基本选项')
@@ -117,7 +117,6 @@ class NuitkaGUI:
         #
         self.rbtn_2 = ttk.Radiobutton(self.f_0, text='单文件模式', variable=self.mode, value='onefile')
         self.rbtn_2.bind('<<RadioButtonSelected>>', lambda event: self.mode.set('onefile'))
-        #这里以后要处理标签页，暂时跳过
         self.rbtn_2.pack(anchor='w', fill='y')
         #
         self.rbtn_3 = ttk.Radiobutton(self.f_0, text='APP模式', variable=self.mode, value='app')
@@ -137,25 +136,58 @@ class NuitkaGUI:
         self.rbtn_6.pack(anchor='w', fill='y')
         ##
         ##
-        self.py_flags = ['isolated','main','no_asserts','no_docstrings','no_site',\
-                         'no_warnings','safe_path','static_hashes','unbuffered','dont_write_bytecode']
+        # 展开循环 - 为每个Python标志创建独立的控件和变量
         self.f_1 = ttk.LabelFrame(self.tab_0, text='Python标志', labelanchor='nw')
         self.f_1.place(x=620,y=20,width=600,height=280)
-        self.py_flag = []
-        self.ctrl_group_1 = dict()
-        self.var_group_1 = dict()
-        for f in self.py_flags:
-            self.var_group_1[f] = tk.IntVar(value=0)
-            self.ctrl_group_1[f] = ttk.Checkbutton(self.f_1, variable=self.var_group_1[f],\
-                                                   offvalue=0, onvalue=1, text=f)
-            self.ctrl_group_1[f].pack(anchor='w', fill='y')
+        
+        # 为每个标志创建独立的IntVar和Checkbutton
+        self.var_isolated = tk.IntVar(value=0)
+        self.cbtn_isolated = ttk.Checkbutton(self.f_1, variable=self.var_isolated, offvalue=0, onvalue=1, text='isolated')
+        self.cbtn_isolated.pack(anchor='w', fill='y')
+        
+        self.var_main = tk.IntVar(value=0)
+        self.cbtn_main = ttk.Checkbutton(self.f_1, variable=self.var_main, offvalue=0, onvalue=1, text='main')
+        self.cbtn_main.pack(anchor='w', fill='y')
+        
+        self.var_no_asserts = tk.IntVar(value=0)
+        self.cbtn_no_asserts = ttk.Checkbutton(self.f_1, variable=self.var_no_asserts, offvalue=0, onvalue=1, text='no_asserts')
+        self.cbtn_no_asserts.pack(anchor='w', fill='y')
+        
+        self.var_no_docstrings = tk.IntVar(value=0)
+        self.cbtn_no_docstrings = ttk.Checkbutton(self.f_1, variable=self.var_no_docstrings, offvalue=0, onvalue=1, text='no_docstrings')
+        self.cbtn_no_docstrings.pack(anchor='w', fill='y')
+        
+        self.var_no_site = tk.IntVar(value=0)
+        self.cbtn_no_site = ttk.Checkbutton(self.f_1, variable=self.var_no_site, offvalue=0, onvalue=1, text='no_site')
+        self.cbtn_no_site.pack(anchor='w', fill='y')
+        
+        self.var_no_warnings = tk.IntVar(value=0)
+        self.cbtn_no_warnings = ttk.Checkbutton(self.f_1, variable=self.var_no_warnings, offvalue=0, onvalue=1, text='no_warnings')
+        self.cbtn_no_warnings.pack(anchor='w', fill='y')
+        
+        self.var_safe_path = tk.IntVar(value=0)
+        self.cbtn_safe_path = ttk.Checkbutton(self.f_1, variable=self.var_safe_path, offvalue=0, onvalue=1, text='safe_path')
+        self.cbtn_safe_path.pack(anchor='w', fill='y')
+        
+        self.var_static_hashes = tk.IntVar(value=0)
+        self.cbtn_static_hashes = ttk.Checkbutton(self.f_1, variable=self.var_static_hashes, offvalue=0, onvalue=1, text='static_hashes')
+        self.cbtn_static_hashes.pack(anchor='w', fill='y')
+        
+        self.var_unbuffered = tk.IntVar(value=0)
+        self.cbtn_unbuffered = ttk.Checkbutton(self.f_1, variable=self.var_unbuffered, offvalue=0, onvalue=1, text='unbuffered')
+        self.cbtn_unbuffered.pack(anchor='w', fill='y')
+        
+        self.var_dont_write_bytecode = tk.IntVar(value=0)
+        self.cbtn_dont_write_bytecode = ttk.Checkbutton(self.f_1, variable=self.var_dont_write_bytecode, offvalue=0, onvalue=1, text='dont_write_bytecode')
+        self.cbtn_dont_write_bytecode.pack(anchor='w', fill='y')
+        
         ##
         ##
         self.f_2 = ttk.Labelframe(self.tab_0, text='调试选项', labelanchor='nw')
         self.f_2.place(x=620, y=320, width=600,height=280)
         #
         self.py_dbg = tk.IntVar(value=0)
-        self.cbtn_0 = ttk.Checkbutton(self.f_2, text='Python Debug', offvalue=0, onvalue=1)
+        self.cbtn_0 = ttk.Checkbutton(self.f_2, text='Python Debug', variable=self.py_dbg, offvalue=0, onvalue=1)
         self.cbtn_0.pack(anchor='w', fill='y')
         
 
@@ -164,43 +196,95 @@ class NuitkaGUI:
         self.notebook.add(self.tab_1, text='包含包选项')
         #
         self.prefer_source_code = tk.BooleanVar(value=False)
-        self.cbtn_17 = ttk.Checkbutton(self.tab_1, text='优先使用源代码而不是已经编译的扩展模块',\
-                                       variable=self.prefer_source_code, offvalue=False,\
+        self.cbtn_17 = ttk.Checkbutton(self.tab_1, text='优先使用源代码而不是已经编译的扩展模块',
+                                       variable=self.prefer_source_code, offvalue=False,
                                         onvalue=True)
         self.cbtn_17.place(x=20, y=20, width=1220, height=30)
         ##
         ##
-        self.include_package = []
-        self.include_module = []
-        self.include_plugin_directory = []
-        self.include_plugin_files = []
-        #
-        self.includes = {'include_package':(20, 60),\
-                     'include_module':(640, 60),\
-                        'include_plugin_directory':(20, 320),\
-                         'include_plugin_files':(640, 320)}
-        #
-        self.explain_1 = {'include_package':'包含整个包',\
-                     'include_module':'包含单个模块',\
-                        'include_plugin_directory':'包含插件目录',\
-                         'include_plugin_files':'包含插件文件'}
-        #
-        self.var_group_4 = dict()
-        self.ctrl_group_5 = dict()
-        #
-        for k in self.includes.keys():
-            self.var_group_4[k] = tk.StringVar(value='')
-            self.ctrl_group_5[k] = []
-            self.ctrl_group_5[k].append(ttk.Frame(self.tab_1))
-            self.ctrl_group_5[k][0].place(x=self.includes[k][0], y=self.includes[k][1], width=600, height=240)
-            #
-            self.ctrl_group_5[k].append(ttk.Label(self.ctrl_group_5[k], text=f'{self.explain_1[k]}:'))
-            self.ctrl_group_5[k][1].place(x=10, y=10, width=80, height=30)
-            #
-            self.ctrl_group_5[k].append(ttk.Entry(self.ctrl_group_5[k][0],\
-                                                  textvariable=self.var_group_4[k]))
-            self.ctrl_group_5[k][2].place(x=100, y=10, width=480, height=25)
-            #...
+        # 为每个包含类型创建独立的变量和控件
+        self.includes_content = {
+            'include_package': [],
+            'include_module': [],
+            'include_plugin_directory': [],
+            'include_plugin_files': []
+        }
+
+        # 创建include_package控件组
+        self.include_package_var = tk.StringVar(value='')
+        self.include_package_frame = ttk.Frame(self.tab_1)
+        self.include_package_frame.place(x=20, y=60, width=600, height=240)
+        ttk.Label(self.include_package_frame, text='包含整个包:').place(x=10, y=10, width=80, height=30)
+        self.include_package_entry = ttk.Entry(self.include_package_frame, textvariable=self.include_package_var)
+        self.include_package_entry.place(x=100, y=10, width=250, height=25)
+        self.include_package_add = ttk.Button(self.include_package_frame, text='添加', command=lambda: self.insert(self.include_package_list, self.include_package_var, self.includes_content['include_package']))
+        self.include_package_add.place(x=360, y=10, width=80, height=35)
+        self.include_package_del = ttk.Button(self.include_package_frame, text='删除选中', command=lambda: self.delete_selection(self.include_package_list))
+        self.include_package_del.place(x=450, y=10, width=140, height=35)
+        self.include_package_list = tk.Listbox(self.include_package_frame, width=45, font=tkinter.font.Font(family='Consolas', size=10), activestyle='dotbox')
+        self.include_package_list.place(x=10, y=50, width=360, height=170)
+        self.include_package_scroll_y = ttk.Scrollbar(self.include_package_frame, orient='vertical', command=self.include_package_list.yview)
+        self.include_package_scroll_y.place(x=370, y=50, width=20, height=170)
+        self.include_package_scroll_x = ttk.Scrollbar(self.include_package_frame, orient='horizontal', command=self.include_package_list.xview)
+        self.include_package_scroll_x.place(x=10, y=220, width=360, height=20)
+        self.include_package_list.config(yscrollcommand=self.include_package_scroll_y.set, xscrollcommand=self.include_package_scroll_x.set)
+
+        # 创建include_module控件组
+        self.include_module_var = tk.StringVar(value='')
+        self.include_module_frame = ttk.Frame(self.tab_1)
+        self.include_module_frame.place(x=640, y=60, width=600, height=240)
+        ttk.Label(self.include_module_frame, text='包含单个模块:').place(x=10, y=10, width=80, height=30)
+        self.include_module_entry = ttk.Entry(self.include_module_frame, textvariable=self.include_module_var)
+        self.include_module_entry.place(x=100, y=10, width=250, height=25)
+        self.include_module_add = ttk.Button(self.include_module_frame, text='添加', command=lambda: self.insert(self.include_module_list, self.include_module_var, self.includes_content['include_module']))
+        self.include_module_add.place(x=360, y=10, width=80, height=35)
+        self.include_module_del = ttk.Button(self.include_module_frame, text='删除选中', command=lambda: self.delete_selection(self.include_module_list))
+        self.include_module_del.place(x=450, y=10, width=140, height=35)
+        self.include_module_list = tk.Listbox(self.include_module_frame, width=45, font=tkinter.font.Font(family='Consolas', size=10), activestyle='dotbox')
+        self.include_module_list.place(x=10, y=50, width=360, height=170)
+        self.include_module_scroll_y = ttk.Scrollbar(self.include_module_frame, orient='vertical', command=self.include_module_list.yview)
+        self.include_module_scroll_y.place(x=370, y=50, width=20, height=170)
+        self.include_module_scroll_x = ttk.Scrollbar(self.include_module_frame, orient='horizontal', command=self.include_module_list.xview)
+        self.include_module_scroll_x.place(x=10, y=220, width=360, height=20)
+        self.include_module_list.config(yscrollcommand=self.include_module_scroll_y.set, xscrollcommand=self.include_module_scroll_x.set)
+
+        # 创建include_plugin_directory控件组
+        self.include_plugin_directory_var = tk.StringVar(value='')
+        self.include_plugin_directory_frame = ttk.Frame(self.tab_1)
+        self.include_plugin_directory_frame.place(x=20, y=320, width=600, height=240)
+        ttk.Label(self.include_plugin_directory_frame, text='包含插件目录:').place(x=10, y=10, width=80, height=30)
+        self.include_plugin_directory_entry = ttk.Entry(self.include_plugin_directory_frame, textvariable=self.include_plugin_directory_var)
+        self.include_plugin_directory_entry.place(x=100, y=10, width=250, height=25)
+        self.include_plugin_directory_add = ttk.Button(self.include_plugin_directory_frame, text='添加', command=lambda: self.insert(self.include_plugin_directory_list, self.include_plugin_directory_var, self.includes_content['include_plugin_directory']))
+        self.include_plugin_directory_add.place(x=360, y=10, width=80, height=35)
+        self.include_plugin_directory_del = ttk.Button(self.include_plugin_directory_frame, text='删除选中', command=lambda: self.delete_selection(self.include_plugin_directory_list))
+        self.include_plugin_directory_del.place(x=450, y=10, width=140, height=35)
+        self.include_plugin_directory_list = tk.Listbox(self.include_plugin_directory_frame, width=45, font=tkinter.font.Font(family='Consolas', size=10), activestyle='dotbox')
+        self.include_plugin_directory_list.place(x=10, y=50, width=360, height=170)
+        self.include_plugin_directory_scroll_y = ttk.Scrollbar(self.include_plugin_directory_frame, orient='vertical', command=self.include_plugin_directory_list.yview)
+        self.include_plugin_directory_scroll_y.place(x=370, y=50, width=20, height=170)
+        self.include_plugin_directory_scroll_x = ttk.Scrollbar(self.include_plugin_directory_frame, orient='horizontal', command=self.include_plugin_directory_list.xview)
+        self.include_plugin_directory_scroll_x.place(x=10, y=220, width=360, height=20)
+        self.include_plugin_directory_list.config(yscrollcommand=self.include_plugin_directory_scroll_y.set, xscrollcommand=self.include_plugin_directory_scroll_x.set)
+
+        # 创建include_plugin_files控件组
+        self.include_plugin_files_var = tk.StringVar(value='')
+        self.include_plugin_files_frame = ttk.Frame(self.tab_1)
+        self.include_plugin_files_frame.place(x=640, y=320, width=600, height=240)
+        ttk.Label(self.include_plugin_files_frame, text='包含插件文件:').place(x=10, y=10, width=80, height=30)
+        self.include_plugin_files_entry = ttk.Entry(self.include_plugin_files_frame, textvariable=self.include_plugin_files_var)
+        self.include_plugin_files_entry.place(x=100, y=10, width=250, height=25)
+        self.include_plugin_files_add = ttk.Button(self.include_plugin_files_frame, text='添加', command=lambda: self.insert(self.include_plugin_files_list, self.include_plugin_files_var, self.includes_content['include_plugin_files']))
+        self.include_plugin_files_add.place(x=360, y=10, width=80, height=35)
+        self.include_plugin_files_del = ttk.Button(self.include_plugin_files_frame, text='删除选中', command=lambda: self.delete_selection(self.include_plugin_files_list))
+        self.include_plugin_files_del.place(x=450, y=10, width=140, height=35)
+        self.include_plugin_files_list = tk.Listbox(self.include_plugin_files_frame, width=45, font=tkinter.font.Font(family='Consolas', size=10), activestyle='dotbox')
+        self.include_plugin_files_list.place(x=10, y=50, width=360, height=170)
+        self.include_plugin_files_scroll_y = ttk.Scrollbar(self.include_plugin_files_frame, orient='vertical', command=self.include_plugin_files_list.yview)
+        self.include_plugin_files_scroll_y.place(x=370, y=50, width=20, height=170)
+        self.include_plugin_files_scroll_x = ttk.Scrollbar(self.include_plugin_files_frame, orient='horizontal', command=self.include_plugin_files_list.xview)
+        self.include_plugin_files_scroll_x.place(x=10, y=220, width=360, height=20)
+        self.include_plugin_files_list.config(yscrollcommand=self.include_plugin_files_scroll_y.set, xscrollcommand=self.include_plugin_files_scroll_x.set)
 
     def imports_tab(self):
         self.tab_2 = ttk.Frame(self.notebook)
@@ -322,7 +406,8 @@ class NuitkaGUI:
         self.sbox_1.grid(column=1, row=6, sticky='w')
 
     def data_tab(self):
-        pass
+        self.tab_16 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_16, text='数据文件')
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
@@ -642,76 +727,172 @@ class NuitkaGUI:
         self.tab_13 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_13, text='版本信息')
         #
-        self.explain_0 = {'company_name':'版本信息中公司名称',
-                          'product_name':'版本信息中产品名称',
-                          'file_version':'版本信息中文件版本',
-                          'product_version':'版本信息中产品版本',
-                          'copyright_text':'版本信息中版权信息'}
-        self.ctrl_group_4 = dict()
-        self.ctrl_group_5 = dict()
-        self.var_group_3 = dict()
-        n = 0
-        for exp in self.explain_0.keys():
-            self.var_group_3[exp] = tk.StringVar()
-            self.ctrl_group_5[exp] = ttk.Label(self.tab_13, text=self.explain_0[exp])
-            self.ctrl_group_5[exp].grid(column=0, row=n, padx=10, pady=10)
-            self.ctrl_group_4[exp] = ttk.Entry(self.tab_13, textvariable=self.var_group_3[exp],\
-                                               width=100)
-            self.ctrl_group_4[exp].grid(column=1, row=n, padx=10, pady=10)
-            n += 1
+        # 为每个信息项创建独立的标签和输入框
+        self.company_name_var = tk.StringVar()
+        ttk.Label(self.tab_13, text='版本信息中公司名称').grid(column=0, row=0, padx=10, pady=10)
+        ttk.Entry(self.tab_13, textvariable=self.company_name_var, width=100).grid(column=1, row=0, padx=10, pady=10)
+        
+        self.product_name_var = tk.StringVar()
+        ttk.Label(self.tab_13, text='版本信息中产品名称').grid(column=0, row=1, padx=10, pady=10)
+        ttk.Entry(self.tab_13, textvariable=self.product_name_var, width=100).grid(column=1, row=1, padx=10, pady=10)
+        
+        self.file_version_var = tk.StringVar()
+        ttk.Label(self.tab_13, text='版本信息中文件版本').grid(column=0, row=2, padx=10, pady=10)
+        ttk.Entry(self.tab_13, textvariable=self.file_version_var, width=100).grid(column=1, row=2, padx=10, pady=10)
+        
+        self.product_version_var = tk.StringVar()
+        ttk.Label(self.tab_13, text='版本信息中产品版本').grid(column=0, row=3, padx=10, pady=10)
+        ttk.Entry(self.tab_13, textvariable=self.product_version_var, width=100).grid(column=1, row=3, padx=10, pady=10)
+        
+        self.copyright_text_var = tk.StringVar()
+        ttk.Label(self.tab_13, text='版本信息中版权信息').grid(column=0, row=4, padx=10, pady=10)
+        ttk.Entry(self.tab_13, textvariable=self.copyright_text_var, width=100).grid(column=1, row=4, padx=10, pady=10)
 
     def plugin_tab(self):
         self.plugins = [
-        "anti-bloat",
-        "data-files",
-        "delvewheel",
-        "dill-compat",
-        "dll-files",
-        "enum-compat",
-        "eventlet",
-        "gevent",
-        "gi",
-        "glfw",
-        "implicit-imports",
-        "kivy",
-        "matplotlib",
-        "multiprocessing",
-        "no-qt",
-        "options-nanny",
-        "pbr-compat",
-        "pkg-resources",
-        "playwright",
-        "pmw-freezer",
-        "pylint-warnings",
-        "pyqt5",
-        "pyqt6",
-        "pyside2",
-        "pyside6",
-        "pywebview",
-        "spacy",
-        "tk-inter",
-        "transformers"]
-        #29 items,6 columns,5 rows
-        #
+            "anti-bloat", "data-files", "delvewheel", "dill-compat", "dll-files",
+            "enum-compat", "eventlet", "gevent", "gi", "glfw", "implicit-imports",
+            "kivy", "matplotlib", "multiprocessing", "no-qt", "options-nanny",
+            "pbr-compat", "pkg-resources", "playwright", "pmw-freezer",
+            "pylint-warnings", "pyqt5", "pyqt6", "pyside2", "pyside6", "pywebview",
+            "spacy", "tk-inter", "transformers"
+        ]
+        
         self.tab_14 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_14, text='插件选项')
-        #
+        
         self.f_7 = ttk.Labelframe(self.tab_14, text='启用插件', labelanchor='nw')
         self.f_7.place(x=20, y=20, width=1220, height=200)
-        #
-        self.ctrl_group_2 = dict()
-        self.var_group_2 = dict()
-        for i in range(29):
-            p = self.plugins[i]
-            self.var_group_2[p] = tk.IntVar(value=0)
-            self.ctrl_group_2[p] = ttk.Checkbutton(self.f_7, variable=self.var_group_2[p],\
-                                                   offvalue=0, onvalue=1, text=p)
-            row = i % 5
-            col = i % 6
-            self.ctrl_group_2[p].grid(column=col, row=row, sticky='w')
         
-        #
-        self.help_plugin = """anti-bloat 精简优化：从广泛使用的库模块源代码中移除不必要的导入。
+        # 为每个插件创建独立的IntVar和Checkbutton
+        self.plugin_vars = {}
+        self.plugin_buttons = {}
+        
+        # 第1列
+        self.plugin_vars["anti-bloat"] = tk.IntVar(value=0)
+        self.plugin_buttons["anti-bloat"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["anti-bloat"], text="anti-bloat")
+        self.plugin_buttons["anti-bloat"].grid(column=0, row=0, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["data-files"] = tk.IntVar(value=0)
+        self.plugin_buttons["data-files"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["data-files"], text="data-files")
+        self.plugin_buttons["data-files"].grid(column=0, row=1, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["delvewheel"] = tk.IntVar(value=0)
+        self.plugin_buttons["delvewheel"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["delvewheel"], text="delvewheel")
+        self.plugin_buttons["delvewheel"].grid(column=0, row=2, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["dill-compat"] = tk.IntVar(value=0)
+        self.plugin_buttons["dill-compat"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["dill-compat"], text="dill-compat")
+        self.plugin_buttons["dill-compat"].grid(column=0, row=3, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["dll-files"] = tk.IntVar(value=0)
+        self.plugin_buttons["dll-files"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["dll-files"], text="dll-files")
+        self.plugin_buttons["dll-files"].grid(column=0, row=4, sticky='w', padx=5, pady=2)
+        
+        # 第2列
+        self.plugin_vars["enum-compat"] = tk.IntVar(value=0)
+        self.plugin_buttons["enum-compat"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["enum-compat"], text="enum-compat")
+        self.plugin_buttons["enum-compat"].grid(column=1, row=0, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["eventlet"] = tk.IntVar(value=0)
+        self.plugin_buttons["eventlet"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["eventlet"], text="eventlet")
+        self.plugin_buttons["eventlet"].grid(column=1, row=1, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["gevent"] = tk.IntVar(value=0)
+        self.plugin_buttons["gevent"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["gevent"], text="gevent")
+        self.plugin_buttons["gevent"].grid(column=1, row=2, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["gi"] = tk.IntVar(value=0)
+        self.plugin_buttons["gi"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["gi"], text="gi")
+        self.plugin_buttons["gi"].grid(column=1, row=3, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["glfw"] = tk.IntVar(value=0)
+        self.plugin_buttons["glfw"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["glfw"], text="glfw")
+        self.plugin_buttons["glfw"].grid(column=1, row=4, sticky='w', padx=5, pady=2)
+        
+        # 第3列
+        self.plugin_vars["implicit-imports"] = tk.IntVar(value=0)
+        self.plugin_buttons["implicit-imports"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["implicit-imports"], text="implicit-imports")
+        self.plugin_buttons["implicit-imports"].grid(column=2, row=0, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["kivy"] = tk.IntVar(value=0)
+        self.plugin_buttons["kivy"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["kivy"], text="kivy")
+        self.plugin_buttons["kivy"].grid(column=2, row=1, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["matplotlib"] = tk.IntVar(value=0)
+        self.plugin_buttons["matplotlib"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["matplotlib"], text="matplotlib")
+        self.plugin_buttons["matplotlib"].grid(column=2, row=2, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["multiprocessing"] = tk.IntVar(value=0)
+        self.plugin_buttons["multiprocessing"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["multiprocessing"], text="multiprocessing")
+        self.plugin_buttons["multiprocessing"].grid(column=2, row=3, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["no-qt"] = tk.IntVar(value=0)
+        self.plugin_buttons["no-qt"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["no-qt"], text="no-qt")
+        self.plugin_buttons["no-qt"].grid(column=2, row=4, sticky='w', padx=5, pady=2)
+        
+        # 第4列
+        self.plugin_vars["options-nanny"] = tk.IntVar(value=0)
+        self.plugin_buttons["options-nanny"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["options-nanny"], text="options-nanny")
+        self.plugin_buttons["options-nanny"].grid(column=3, row=0, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["pbr-compat"] = tk.IntVar(value=0)
+        self.plugin_buttons["pbr-compat"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pbr-compat"], text="pbr-compat")
+        self.plugin_buttons["pbr-compat"].grid(column=3, row=1, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["pkg-resources"] = tk.IntVar(value=0)
+        self.plugin_buttons["pkg-resources"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pkg-resources"], text="pkg-resources")
+        self.plugin_buttons["pkg-resources"].grid(column=3, row=2, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["playwright"] = tk.IntVar(value=0)
+        self.plugin_buttons["playwright"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["playwright"], text="playwright")
+        self.plugin_buttons["playwright"].grid(column=3, row=3, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["pmw-freezer"] = tk.IntVar(value=0)
+        self.plugin_buttons["pmw-freezer"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pmw-freezer"], text="pmw-freezer")
+        self.plugin_buttons["pmw-freezer"].grid(column=3, row=4, sticky='w', padx=5, pady=2)
+        
+        # 第5列
+        self.plugin_vars["pylint-warnings"] = tk.IntVar(value=0)
+        self.plugin_buttons["pylint-warnings"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pylint-warnings"], text="pylint-warnings")
+        self.plugin_buttons["pylint-warnings"].grid(column=4, row=0, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["pyqt5"] = tk.IntVar(value=0)
+        self.plugin_buttons["pyqt5"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pyqt5"], text="pyqt5")
+        self.plugin_buttons["pyqt5"].grid(column=4, row=1, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["pyqt6"] = tk.IntVar(value=0)
+        self.plugin_buttons["pyqt6"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pyqt6"], text="pyqt6")
+        self.plugin_buttons["pyqt6"].grid(column=4, row=2, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["pyside2"] = tk.IntVar(value=0)
+        self.plugin_buttons["pyside2"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pyside2"], text="pyside2")
+        self.plugin_buttons["pyside2"].grid(column=4, row=3, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["pyside6"] = tk.IntVar(value=0)
+        self.plugin_buttons["pyside6"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pyside6"], text="pyside6")
+        self.plugin_buttons["pyside6"].grid(column=4, row=4, sticky='w', padx=5, pady=2)
+        
+        # 第6列
+        self.plugin_vars["pywebview"] = tk.IntVar(value=0)
+        self.plugin_buttons["pywebview"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pywebview"], text="pywebview")
+        self.plugin_buttons["pywebview"].grid(column=5, row=0, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["spacy"] = tk.IntVar(value=0)
+        self.plugin_buttons["spacy"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["spacy"], text="spacy")
+        self.plugin_buttons["spacy"].grid(column=5, row=1, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["tk-inter"] = tk.IntVar(value=0)
+        self.plugin_buttons["tk-inter"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["tk-inter"], text="tk-inter")
+        self.plugin_buttons["tk-inter"].grid(column=5, row=2, sticky='w', padx=5, pady=2)
+        
+        self.plugin_vars["transformers"] = tk.IntVar(value=0)
+        self.plugin_buttons["transformers"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["transformers"], text="transformers")
+        self.plugin_buttons["transformers"].grid(column=5, row=3, sticky='w', padx=5, pady=2)
+        
+        # 其余部分保持不变...
+        self.help_plugin = """=======================================================================
+anti-bloat 精简优化：从广泛使用的库模块源代码中移除不必要的导入。
 data-files 数据文件：根据包配置文件包含指定的数据文件。
 delvewheel delvewheel 支持：在独立模式下支持使用 delvewheel 的包所必需。
 dill-compat dill 兼容性：为 'dill' 包和 'cloudpickle' 提供兼容性支持所必需。
@@ -740,7 +921,6 @@ pywebview Webview 支持：为 'webview' 包 (PyPI 上的 pywebview) 所必需�
 spacy spaCy 支持：为 'spacy' 包所必需。
 tk-inter Tkinter 支持：为 Python 的 Tk 模块所必需。
 transformers Transformers 支持：为 transformers 包提供隐式导入。
-upx UPX 压缩：自动使用 UPX 压缩生成的可执行文件。
 ========================================================================"""
         #
         self.f_8 = ttk.Labelframe(self.tab_14, text='用户插件', labelanchor='nw')
