@@ -20,7 +20,7 @@
                         使用Python 3.4编译时，指定用于Scons的Python路径（Windows需Python 3.5+，非Windows需Python 2.6+）。
   --main=PATH           替代位置参数指定编译文件。多次使用时启用"multidist"模式。
 
-  ]8;;https://nuitka.net/help/include-section.html\控制模块和包的包含]8;;\：
+  控制模块和包的包含：
     --include-package=PACKAGE
                         包含整个包（如 "some_package.sub_package"）。默认为空。
     --include-module=MODULE

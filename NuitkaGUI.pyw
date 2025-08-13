@@ -408,6 +408,8 @@ class NuitkaGUI:
     def data_tab(self):
         self.tab_16 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_16, text='数据文件')
+        #
+        self.font_0 = tkinter.font.Font(family='Consolas', size=10)
         
         # 创建主框架容器
         self.main_container = ttk.Frame(self.tab_16)
@@ -457,12 +459,12 @@ class NuitkaGUI:
         self.btn_15.grid(row=0, column=3, padx=5, pady=5)
         
         # 创建 Listbox 和滚动条
-        list_frame = ttk.Frame(self.f_19)
-        list_frame.grid(row=1, column=0, columnspan=4, sticky='nsew', padx=5, pady=5)
+        self.list_frame_0 = ttk.Frame(self.f_19)
+        self.list_frame_0.grid(row=1, column=0, columnspan=4, sticky='nsew', padx=5, pady=5)
         
-        self.lbox_3 = tk.Listbox(list_frame, activestyle='dotbox', height=8)
-        self.lbox_3_scroll_y = ttk.Scrollbar(list_frame, orient='vertical', command=self.lbox_3.yview)
-        self.lbox_3_scroll_x = ttk.Scrollbar(list_frame, orient='horizontal', command=self.lbox_3.xview)
+        self.lbox_3 = tk.Listbox(self.list_frame_0, activestyle='dotbox', height=8, font=self.font_0)
+        self.lbox_3_scroll_y = ttk.Scrollbar(self.list_frame_0, orient='vertical', command=self.lbox_3.yview)
+        self.lbox_3_scroll_x = ttk.Scrollbar(self.list_frame_0, orient='horizontal', command=self.lbox_3.xview)
         
         self.lbox_3.config(
             yscrollcommand=self.lbox_3_scroll_y.set,
@@ -475,8 +477,8 @@ class NuitkaGUI:
         self.lbox_3_scroll_x.grid(row=1, column=0, sticky='ew')
         
         # 配置网格权重
-        list_frame.columnconfigure(0, weight=1)
-        list_frame.rowconfigure(0, weight=1)
+        self.list_frame_0.columnconfigure(0, weight=1)
+        self.list_frame_0.rowconfigure(0, weight=1)
         self.f_19.columnconfigure(1, weight=1)
         ###########################################################
 
@@ -493,9 +495,43 @@ class NuitkaGUI:
         self.e_18 = ttk.Entry(self.f_20, textvariable=self.noinclude_data_files_var, width=70)
         self.e_18.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.btn_16 = ttk.Button(self.f_20, text='添加')
+        self.btn_16 = ttk.Button(self.f_20, text='添加', command=lambda: self.insert(self.lbox_4, self.noinclude_data_files_var, self.noinclude_data_files))
         self.btn_16.grid(column=2, row=0, padx=5, pady=5)
-        ...
+        #
+        self.btn_17 = ttk.Button(self.f_20, text='删除选中', command=lambda: self.delete_selection(self.lbox_4))
+        self.btn_17.grid(column=3, row=0, padx=5, pady=5)
+        ##
+        self.list_frame_1 = ttk.Frame(self.f_20)
+        self.list_frame_1.grid(column=0, row=1, columnspan=4, padx=5, pady=5, sticky='nsew')
+        #
+        self.lbox_4 = tk.Listbox(self.list_frame_1, activestyle='dotbox', height=8, font=self.font_0)
+        self.scr_6 = ttk.Scrollbar(self.list_frame_1, command=self.lbox_4.yview, orient='vertical')
+        self.scr_7 = ttk.Scrollbar(self.list_frame_1, command=self.lbox_4.xview, orient='horizontal')
+        self.lbox_4.configure(yscrollcommand=self.scr_6.set, xscrollcommand=self.scr_7.set)
+        #
+        self.lbox_4.grid(column=0, row=0, sticky='nsew')
+        self.scr_6.grid(column=1, row=0, sticky='ns')
+        self.scr_7.grid(column=0, row=1, sticky='ew')
+        #
+        self.list_frame_1.columnconfigure(0, weight=1)
+        self.list_frame_1.rowconfigure(0, weight=1)
+        self.f_20.columnconfigure(1, weight=1)
+        ##############################################################################
+        #包含的数据文件
+        self.include_data_files = dict()
+        self.include_data_files_var = tk.StringVar(value='')
+        ##
+        self.f_21 = ttk.Labelframe(self.frame, text='包含的数据文件', labelanchor='nw')
+        self.f_21.pack(fill='x', padx=10, pady=10)
+        #
+        self.lb_23 = ttk.Label(self.f_21, text='包含数据文件:')
+        self.lb_23.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.e_19 = ttk.Entry(self.f_21, textvariable=self.include_data_files_var, width=40)
+        self.e_19.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.lb_24 = ttk.Label(self.f_21, text='到:')
+        self.lb_24.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
