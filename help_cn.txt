@@ -1,0 +1,331 @@
+用法：python.exe -m nuitka [--mode=编译模式] [--run] [选项] 主模块.py
+
+选项：
+  --help                显示此帮助信息并退出
+  --version             显示版本信息及错误报告所需的重要细节，然后退出。默认为关闭。
+  --module              创建可导入的二进制扩展模块而非程序。默认为关闭。
+  --mode=COMPILATION_MODE
+                        编译模式。accelerated（加速）模式在您的Python环境中运行并依赖它。standalone（独立）模式创建包含可执行文件的文件夹。
+                        onefile（单文件）模式创建单个可执行文件。app模式在非macOS系统等同于onefile。module（模块）模式创建扩展模块，
+                        package（包）模式包含所有子模块和子包。dll模式目前处于开发阶段。默认为 'accelerated'。
+  --standalone          启用独立模式输出。允许将生成的二进制文件转移到其他机器而无需Python环境，但体积会变大。
+                        隐含选项："--follow-imports" 和 "--python-flag=no_site"。默认为关闭。
+  --onefile             在独立模式基础上启用单文件模式。生成压缩的可执行文件而非文件夹。默认为关闭。
+  --python-flag=FLAG    指定Python运行标志。默认为当前运行Nuitka的环境。支持：
+                        "-S" (别名 "no_site"), "static_hashes", "no_warnings", 
+                        "-O" (别名 "no_asserts"), "no_docstrings", "-u" (别名 "unbuffered"),
+                        "isolated", "-P" (别名 "safe_path"), "-m"。默认为空。
+  --python-debug        是否使用调试版Python。默认使用当前环境版本（通常是非调试版）。仅用于调试测试。
+  --python-for-scons=PATH
+                        使用Python 3.4编译时，指定用于Scons的Python路径（Windows需Python 3.5+，非Windows需Python 2.6+）。
+  --main=PATH           替代位置参数指定编译文件。多次使用时启用"multidist"模式。
+
+  ]8;;https://nuitka.net/help/include-section.html\控制模块和包的包含]8;;\：
+    --include-package=PACKAGE
+                        包含整个包（如 "some_package.sub_package"）。默认为空。
+    --include-module=MODULE
+                        包含单个模块（如 "some_package.some_module"）。默认为空。
+    --include-plugin-directory=MODULE/PACKAGE
+                        包含目录中的代码（视为主文件）。覆盖其他包含选项。默认为空。
+    --include-plugin-files=PATTERN
+                        包含匹配文件模式的文件。覆盖其他跟踪选项。默认为空。
+    --prefer-source-code
+                        优先从源代码编译扩展模块以获得最佳性能。默认为关闭。
+
+  控制导入模块行为：
+    --follow-imports    深入所有导入模块。独立模式默认开启，其他模式关闭。
+    --follow-import-to=MODULE/PACKAGE
+                        跟踪指定模块/包（可多次使用）。默认为空。
+    --nofollow-import-to=MODULE/PACKAGE
+                        不跟踪指定模块/包（支持通配符如 "*.tests"，可多次使用）。默认为空。
+    --nofollow-imports  不深入任何导入模块（覆盖所有包含选项，独立模式不可用）。默认为关闭。
+    --follow-stdlib     跟踪标准库导入（显著增加编译时间，测试不充分）。默认为关闭。
+
+  单文件模式选项：
+    --onefile-tempdir-spec=ONEFILE_TEMPDIR_SPEC
+                        单文件模式解压目录（默认 '{TEMP}/onefile_{PID}_{TIME}'）。
+    --onefile-cache-mode=ONEFILE_CACHED_MODE
+                        缓存模式（"auto" 根据路径推断 "temporary" 或 "cached"）。
+    --onefile-child-grace-time=GRACE_TIME_MS
+                        子进程终止宽限时间（单位ms，默认5000）。
+    --onefile-no-compression
+                        禁用单文件压缩（调试用）。默认为关闭。
+    --onefile-as-archive
+                        创建可被 nuitka-onefile-unpack 解压的归档格式。默认为关闭。
+    --onefile-no-dll    单文件模式使用可执行文件而非DLL（Windows专用）。默认为关闭。
+
+  数据文件控制：
+    --include-package-data=PACKAGE
+                        包含包的数据文件（格式：包名[:文件模式]）。默认为空。
+    --include-data-files=DESC
+                        按文件名包含数据文件（格式多样）。默认为空。
+    --include-data-dir=DIRECTORY
+                        递归包含目录数据文件（如 '/path/some_dir=data/some_dir'）。默认为空。
+    --noinclude-data-files=PATTERN
+                        排除匹配目标文件名的数据文件（如 'package_name/*.txt'）。默认为空。
+    --include-onefile-external-data=PATTERN
+                        在单文件外部包含数据文件（需配合其他包含选项）。默认为空。
+    --list-package-data=LIST_PACKAGE_DATA
+                        列出指定包的数据文件。默认不执行。
+    --include-raw-dir=DIRECTORY
+                        递归包含原始目录（实验性）。默认为空。
+
+  元数据支持：
+    --include-distribution-metadata=DISTRIBUTION
+                        包含指定分发的元数据信息。默认为空。
+    --list-distribution-metadata
+                        列出所有包的元数据详情。默认不执行。
+
+  DLL控制：
+    --noinclude-dlls=PATTERN
+                        排除匹配目标文件名的DLL（如 'package_name/someDLL.*'）。默认为空。
+    --list-package-dlls=LIST_PACKAGE_DLLS
+                        列出指定包的DLL。默认不执行。
+    --list-package-exe=LIST_PACKAGE_EXE
+                        列出指定包的EXE。默认不执行。
+
+  警告控制：
+    --warn-implicit-exceptions
+                        启用编译时隐式异常检测警告。
+    --warn-unusual-code
+                        启用编译时代码异常检测警告。
+    --assume-yes-for-downloads
+                        允许Nuitka自动下载必要组件（默认需确认）。
+    --nowarn-mnemonic=MNEMONIC
+                        禁用指定助记符警告（支持通配符，可多次使用）。默认为空。
+
+  编译后立即执行：
+    --run               立即执行生成的二进制文件。默认为关闭。
+    --debugger          在调试器（gdb/lldb）中执行。默认为关闭。
+
+  编译选择：
+    --user-package-configuration-file=YAML_FILENAME
+                        用户提供的包配置YAML文件（可多次使用）。默认为空。
+    --full-compat       强制完全兼容CPython（仅测试用）。默认为关闭。
+    --file-reference-choice=FILE_MODE
+                        设置 "__file__" 值（"runtime"/"original"/"frozen"）。
+    --module-name-choice=MODULE_NAME_MODE
+                        设置 "__name__" 和 "__package__" 值（"runtime"/"original"）。
+
+  输出控制：
+    --output-filename=FILENAME
+                        指定可执行文件名（扩展模块/独立模式不可用）。默认为 '<程序名>.exe'。
+    --output-dir=DIRECTORY
+                        指定输出目录（存放构建文件/二进制文件等）。默认为当前目录。
+    --remove-output     编译后删除构建目录。默认为关闭。
+    --no-pyi-file       不为扩展模块生成 '.pyi' 文件。默认为关闭。
+    --no-pyi-stubs      生成 '.pyi' 文件时不使用stubgen。默认为关闭。
+
+  部署控制：
+    --deployment        禁用开发辅助功能（如 "-c" 参数执行）。默认为关闭。
+    --no-deployment-flag=FLAG
+                        保留部署模式但禁用特定部分。默认为空。
+
+  环境控制：
+    --force-runtime-environment-variable=VARIABLE_SPEC
+                        强制设置环境变量值。默认为空。
+
+  调试功能：
+    --debug             启用Nuitka自检（勿用于生产）。默认为关闭。
+    --no-debug-immortal-assumptions
+                        禁用 "--debug" 的永生对象检查（Python3.12+）。默认与 "--debug" 同步。
+    --no-debug-c-warnings
+                        禁用 "--debug" 的C编译警告检查。
+    --unstripped        保留对象文件调试信息。默认为关闭。
+    --profile           启用vmprof性能分析（暂不可用）。默认为关闭。
+    --trace-execution   输出执行代码行跟踪。默认为关闭。
+    --xml=XML_FILENAME  将内部程序结构/优化结果输出为XML。
+    --experimental=FLAG
+                        启用实验性功能（需保密标签）。默认为关闭。
+    --low-memory        低内存模式（减少编译进程/内存使用）。默认为关闭。
+    --create-environment-from-report=CREATE_ENVIRONMENT_FROM_REPORT
+                        根据报告文件（如 '--report=compilation-report.xml'）创建虚拟环境。
+    --generate-c-only   仅生成C源码（不编译）。默认为关闭。
+
+  Nuitka开发功能：
+    --devel-missing-code-helpers
+                        报告缺失的类型代码助手警告。默认为关闭。
+    --devel-missing-trust
+                        报告可信任但未处理的导入警告。默认为关闭。
+    --devel-recompile-c-only
+                        仅重新编译现有C文件（开发用）。默认为关闭。
+    --devel-internal-graph
+                        生成优化过程内部图（仅限小型测试）。默认为关闭。
+
+  后端C编译器选择：
+    --clang             强制使用clang（Windows需Visual Studio）。默认为关闭。
+    --mingw64           强制在Windows使用MinGW64（MSYS2环境默认启用）。默认为关闭。
+    --msvc=MSVC_VERSION
+                        强制在Windows使用特定MSVC版本（如 "14.3"，可用 "list"/"latest"）。默认为最新MSVC。
+    --jobs=N            并行C编译任务数（负值=系统CPU数-|N|）。默认满负载（低内存模式为1）。
+    --lto=choice        启用LTO链接优化（"yes"/"no"/"auto"）。默认为 "auto"。
+    --static-libpython=choice
+                        静态链接Python库（"yes"/"no"/"auto"）。默认为 "auto"。
+    --cf-protection=PROTECTION_MODE
+                        gcc的cf-protection模式（"auto"/"none"等）。默认为 "auto"。
+
+  缓存控制：
+    --disable-cache=DISABLED_CACHES
+                        禁用指定缓存（"all"/"ccache"/"bytecode"等，可多值）。默认为空。
+    --clean-cache=CLEAN_CACHES
+                        执行前清理指定缓存（同上）。默认为空。
+    --force-dll-dependency-cache-update
+                        强制更新DLL依赖缓存（显著增加构建时间）。
+
+  PGO编译选项：
+    --pgo-c             启用C层级PGO优化（实验性，暂不支持独立模式）。默认为关闭。
+    --pgo-args=PGO_ARGS
+                        PGO性能收集运行的参数。默认为空。
+    --pgo-executable=PGO_EXECUTABLE
+                        PGO性能收集的启动命令（默认使用生成程序）。默认为空。
+
+  跟踪功能：
+    --report=REPORT_FILENAME
+                        生成XML报告（包含模块/编译详情等）。默认为关闭。
+    --report-diffable   生成可差异对比的报告（排除运行时变量）。默认为关闭。
+    --report-user-provided=KEY_VALUE
+                        添加用户数据到报告（"key=value" 格式，可多次使用）。默认为空。
+    --report-template=REPORT_DESC
+                        通过模板生成报告（格式："模板.j2:输出文件"）。默认为空。
+    --quiet             禁用所有信息输出（仅显示警告）。默认为关闭。
+    --show-scons        显示Scons详细构建信息。默认为关闭。
+    --no-progressbar    禁用进度条。默认为关闭。
+    --show-progress     显示进度信息（已废弃）。默认为关闭。
+    --show-memory       显示内存信息。默认为关闭。
+    --show-modules      显示包含的模块/DLL信息（已废弃，推荐 "--report"）。默认为关闭。
+    --show-modules-output=PATH
+                        "--show-modules" 的输出路径（默认为标准输出）。
+    --verbose           显示详细操作日志（特别是优化过程）。默认为关闭。
+    --verbose-output=PATH
+                        "--verbose" 的输出路径（默认为标准输出）。
+
+  操作系统控制：
+    --force-stdout-spec=FORCE_STDOUT_SPEC
+                        强制程序标准输出重定向（如 '{PROGRAM_BASE}.out.txt'）。
+    --force-stderr-spec=FORCE_STDERR_SPEC
+                        强制程序标准错误重定向（如 '{PROGRAM_BASE}.err.txt'）。
+
+  Windows专用控制：
+    --windows-console-mode=CONSOLE_MODE
+                        控制台模式（"force"(默认)/"disable"/"attach"/"hide"）。
+    --windows-icon-from-ico=ICON_PATH
+                        添加可执行图标（可多次使用，支持 "#<n>" 指定索引）。
+    --windows-icon-from-exe=ICON_EXE_PATH
+                        从现有可执行文件复制图标。
+    --onefile-windows-splash-screen-image=SPLASH_SCREEN_IMAGE
+                        单文件模式启动画面（仅Windows）。默认为关闭。
+    --windows-uac-admin 请求UAC管理员权限（仅Windows）。默认为关闭。
+    --windows-uac-uiaccess
+                        请求UAC UI访问权限（仅Windows）。默认为关闭。
+
+  macOS专用控制：
+    --macos-create-app-bundle
+                        创建应用程序包（非独立二进制，隐含独立模式）。默认为关闭。
+    --macos-target-arch=MACOS_TARGET_ARCH
+                        目标架构（默认为当前Python架构 "native"）。
+    --macos-app-icon=ICON_PATH
+                        应用程序包图标（仅一次）。默认为Python图标。
+    --macos-signed-app-name=MACOS_SIGNED_APP_NAME
+                        应用签名名称（推荐 "com.Company.AppName" 格式）。
+    --macos-app-name=MACOS_APP_NAME
+                        产品名称（默认为二进制文件名）。
+    --macos-app-mode=APP_MODE
+                        应用模式（"gui"(默认)/"background"/"ui-element"）。
+    --macos-prohibit-multiple-instances
+                        禁止启动多个应用实例。默认为关闭。
+    --macos-sign-identity=MACOS_APP_VERSION
+                        代码签名标识（默认 "ad-hoc"）。
+    --macos-sign-notarization
+                        启用公证签名（需Apple TeamID）。
+    --macos-app-version=MACOS_APP_VERSION
+                        产品版本（默认 "1.0"）。
+    --macos-app-protected-resource=RESOURCE_DESC
+                        请求受保护资源权限（如 "NSMicrophoneUsageDescription:描述文本"）。
+
+  Linux专用控制：
+    --linux-icon=ICON_PATH
+                        单文件二进制图标（仅一次）。默认为Python图标。
+
+  二进制版本信息：
+    --company-name=COMPANY_NAME
+                        公司名称（版本信息）。
+    --product-name=PRODUCT_NAME
+                        产品名称（默认为二进制文件名）。
+    --file-version=FILE_VERSION
+                        文件版本（最多4位数字，如 1.0.0.0）。
+    --product-version=PRODUCT_VERSION
+                        产品版本（规则同文件版本）。
+    --file-description=FILE_DESCRIPTION
+                        文件描述（仅Windows，默认二进制文件名）。
+    --copyright=COPYRIGHT_TEXT
+                        版权信息（Windows/macOS）。
+    --trademarks=TRADEMARK_TEXT
+                        商标信息（Windows/macOS）。
+
+  插件控制：
+    --enable-plugins=PLUGIN_NAME
+                        启用插件（通过 "--plugin-list" 查询列表）。默认为空。
+    --disable-plugins=PLUGIN_NAME
+                        禁用插件（不推荐禁用标准插件）。默认为空。
+    --user-plugin=PATH  用户插件文件（可多次使用）。默认为空。
+    --plugin-list       显示所有可用插件列表并退出。默认为关闭。
+    --plugin-no-detection
+                        禁用插件自动检测（加速编译）。默认为关闭。
+    --module-parameter=MODULE_PARAMETERS
+                        提供模块参数（格式：--module-parameter=模块名-选项名=值）。默认为空。
+    --show-source-changes=SHOW_SOURCE_CHANGES
+                        显示源码修改（如 '--show-source-changes=numpy.**'）。默认为空。
+
+  交叉编译：
+    --target=TARGET_DESC
+                        交叉编译目标（实验性，仅支持 '--target=wasi'）。
+
+  'anti-bloat'插件选项（类别：核心）:
+    --show-anti-bloat-changes
+                        注释插件所做的更改。
+    --noinclude-setuptools-mode=NOINCLUDE_SETUPTOOLS_MODE
+                        遇到 'setuptools' 导入时的处理方式（处理 'setuptools_scm'）。
+    --noinclude-pytest-mode=NOINCLUDE_PYTEST_MODE
+                        遇到 'pytest' 导入时的处理方式（处理 'nose'）。
+    --noinclude-unittest-mode=NOINCLUDE_UNITTEST_MODE
+                        遇到 unittest 导入时的处理方式。
+    --noinclude-pydoc-mode=NOINCLUDE_PYDOC_MODE
+                        遇到 pydoc 导入时的处理方式。
+    --noinclude-IPython-mode=NOINCLUDE_IPYTHON_MODE
+                        遇到 IPython 导入时的处理方式。
+    --noinclude-dask-mode=NOINCLUDE_DASK_MODE
+                        遇到 'dask' 导入时的处理方式。
+    --noinclude-numba-mode=NOINCLUDE_NUMBA_MODE
+                        遇到 'numba' 导入时的处理方式。
+    --noinclude-default-mode=NOINCLUDE_DEFAULT_MODE
+                        提供上述选项的默认值（"warning"）。
+    --noinclude-custom-mode=CUSTOM_CHOICES
+                        指定导入的自定义处理（格式：模块名:选择，如 PyQt5:error）。
+
+  'dill-compat'插件选项（类别：包支持）:
+    --include-pickle-support-module=PICKLE_SUPPORTED_MODULES
+                        包含对pickle嵌套函数的支持模块（"all" 为默认）。
+
+  'pmw-freezer'插件选项（类别：包支持）:
+    --include-pmw-blt   是否包含 'Pmw.Blt'（默认包含）。
+    --include-pmw-color 是否包含 'Pmw.Color'（默认包含）。
+
+  'tk-inter'插件选项（类别：包支持）:
+    --tk-library-dir=TK_LIBRARY_DIR
+                        Tk库路径（默认自动检测）。
+    --tcl-library-dir=TCL_LIBRARY_DIR
+                        Tcl库路径（默认自动检测）。
+
+  Qt插件选项（'pyside6'/'pyside2'/'pyqt6'/'pyqt5'）（类别：包支持, qt-binding）:
+    --include-qt-plugins=INCLUDE_QT_PLUGINS
+                        包含的Qt插件（默认仅"sensible"，可指定"all"或列表）。
+    --noinclude-qt-plugins=NOINCLUDE_QT_PLUGINS
+                        排除的Qt插件（可配合"all"使用）。
+    --noinclude-qt-translations
+                        不包含Qt翻译文件（QtWebEngine使用）。默认为关闭。
+
+  'upx'插件选项（类别：集成）:
+    --upx-binary=UPX_PATH
+                        UPX二进制路径（默认使用PATH中的 'upx'）。
+    --upx-disable-cache
+                        禁用UPX压缩缓存（默认缓存DLL，不缓存EXE）。

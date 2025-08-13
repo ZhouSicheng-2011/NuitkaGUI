@@ -408,39 +408,76 @@ class NuitkaGUI:
     def data_tab(self):
         self.tab_16 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_16, text='数据文件')
-        #
-        self.canvas = tk.Canvas(master=self.tab_16)
-        self.scr_4 = ttk.Scrollbar(self.tab_16, command=self.canvas.yview, orient='vertical')
-        self.canvas.configure(yscrollcommand=self.scr_4.set)
+        
+        # 创建主框架容器
+        self.main_container = ttk.Frame(self.tab_16)
+        self.main_container.pack(fill='both', expand=True)
+        
+        # 创建 Canvas 和滚动条
+        self.canvas = tk.Canvas(self.main_container)
+        self.scr_4 = ttk.Scrollbar(self.main_container, orient='vertical', command=self.canvas.yview)
+        self.scr_5 = ttk.Scrollbar(self.main_container, orient='horizontal', command=self.canvas.xview)
+        
+        # 配置 Canvas
+        self.canvas.configure(
+            yscrollcommand=self.scr_4.set,
+            xscrollcommand=self.scr_5.set
+        )
+        
+        # 放置 Canvas 和滚动条
+        self.scr_4.pack(side='right', fill='y')
+        self.scr_5.pack(side='bottom', fill='x')
+        self.canvas.pack(side='left', fill='both', expand=True)
+        
+        # 创建内部框架
         self.frame = ttk.Frame(self.canvas)
-        self.frame_id = self.canvas.create_window(0, 0, window=self.frame, anchor='nw')
+        self.frame_id = self.canvas.create_window((0, 0), window=self.frame, anchor='nw')
+        
+        # 绑定事件
         self.frame.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox('all')))
         self.canvas.bind('<Configure>', lambda e: self.canvas.itemconfig(self.frame_id, width=e.width))
         self.canvas.bind_all('<MouseWheel>', self.on_mousewheel)
-        self.canvas.bind_all('<Button-4>', self.on_mousewheel)
-        self.canvas.bind_all('Button-5>', self.on_mousewheel)
-        self.canvas.pack(side='left', fill='both', expand=True)
-        self.canvas.pack(side='right', fill='y')
-        ###
-        ###
-        self.f_19 = ttk.Labelframe(self.frame, text='包含包数据文件', labelanchor='nw', width=1220, height=400)
-        self.f_19.place(x=20, y=20)
-        #
+        
+        # 创建包含包数据文件的框架
+        self.f_19 = ttk.Labelframe(self.frame, text='包含包数据文件', labelanchor='nw')
+        self.f_19.pack(fill='x', padx=10, pady=10)
+        
+        # 包含包数据文件的控件
         self.include_package_data = []
         self.include_package_data_var = tk.StringVar(value='')
-        self.lb_22 = ttk.Label(self.f_19, text='包含包数据文件的包')
-        self.lb_22.place(x=10, y=10, width=150, height=30)
-        #
+        
+        ttk.Label(self.f_19, text='包含包数据文件的包').grid(row=0, column=0, padx=5, pady=5, sticky='w')
         self.e_17 = ttk.Entry(self.f_19, textvariable=self.include_package_data_var, width=70)
-        self.e_17.place(x=170, y=15, width=800, height=25)
-        #
-        self.btn_14 = ttk.Button(self.f_19, text='添加')
-        self.btn_14.place(x=880, y=10, width=100, height=35)
-        #
-        self.btn_15 = ttk.Button(self.f_19, text='删除选中')
-        self.btn_15.place(x=990, y=10, width=100, height=35)
-        ##
-        self.lbox_3 = tk.Listbox(self.f_19, activestyle='dotbox')
+        self.e_17.grid(row=0, column=1, padx=5, pady=5, sticky='ew')
+        
+        self.btn_14 = ttk.Button(self.f_19, text='添加', command=lambda: self.insert(self.lbox_3, self.include_package_data_var, self.include_package_data))
+        self.btn_14.grid(row=0, column=2, padx=5, pady=5)
+        
+        self.btn_15 = ttk.Button(self.f_19, text='删除选中', command=lambda: self.delete_selection(self.lbox_3))
+        self.btn_15.grid(row=0, column=3, padx=5, pady=5)
+        
+        # 创建 Listbox 和滚动条
+        list_frame = ttk.Frame(self.f_19)
+        list_frame.grid(row=1, column=0, columnspan=4, sticky='nsew', padx=5, pady=5)
+        
+        self.lbox_3 = tk.Listbox(list_frame, activestyle='dotbox', height=8)
+        self.lbox_3_scroll_y = ttk.Scrollbar(list_frame, orient='vertical', command=self.lbox_3.yview)
+        self.lbox_3_scroll_x = ttk.Scrollbar(list_frame, orient='horizontal', command=self.lbox_3.xview)
+        
+        self.lbox_3.config(
+            yscrollcommand=self.lbox_3_scroll_y.set,
+            xscrollcommand=self.lbox_3_scroll_x.set
+        )
+        
+        # 放置 Listbox 和滚动条
+        self.lbox_3.grid(row=0, column=0, sticky='nsew')
+        self.lbox_3_scroll_y.grid(row=0, column=1, sticky='ns')
+        self.lbox_3_scroll_x.grid(row=1, column=0, sticky='ew')
+        
+        # 配置网格权重
+        list_frame.columnconfigure(0, weight=1)
+        list_frame.rowconfigure(0, weight=1)
+        self.f_19.columnconfigure(1, weight=1)
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
@@ -845,7 +882,7 @@ class NuitkaGUI:
         
         # 第3列
         self.implicit_imports = tk.IntVar(value=0)
-        self.cbtn_28 = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["implicit-imports"], text="implicit-imports")
+        self.cbtn_28 = ttk.Checkbutton(self.f_7, variable=self.implicit_imports, text="implicit-imports")
         self.cbtn_28.grid(column=2, row=0, sticky='w', padx=5, pady=2)
         
         self.kivy = tk.IntVar(value=0)
@@ -888,7 +925,7 @@ class NuitkaGUI:
         # 第5列
         self.pylint_warnings = tk.IntVar(value=0)
         self.cbtn_38= ttk.Checkbutton(self.f_7, variable=self.pylint_warnings, text="pylint-warnings")
-        self.plugin_buttons["pylint-warnings"].grid(column=4, row=0, sticky='w', padx=5, pady=2)
+        self.cbtn_38.grid(column=4, row=0, sticky='w', padx=5, pady=2)
         
         self.pyqt5 = tk.IntVar(value=0)
         self.cbtn_39 = ttk.Checkbutton(self.f_7, variable=self.pyqt5, text="pyqt5")
@@ -899,7 +936,7 @@ class NuitkaGUI:
         self.cbtn_40.grid(column=4, row=2, sticky='w', padx=5, pady=2)
         
         self.pyside2= tk.IntVar(value=0)
-        self.cbtn_41 = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["pyside2"], text="pyside2")
+        self.cbtn_41 = ttk.Checkbutton(self.f_7, variable=self.pyside2, text="pyside2")
         self.cbtn_41.grid(column=4, row=3, sticky='w', padx=5, pady=2)
         
         self.pyside6 = tk.IntVar(value=0)
@@ -916,12 +953,12 @@ class NuitkaGUI:
         self.cbtn_44.grid(column=5, row=1, sticky='w', padx=5, pady=2)
         
         self.tk_inter = tk.IntVar(value=0)
-        self.plugin_buttons["tk-inter"] = ttk.Checkbutton(self.f_7, variable=self.tk_inter, text="tk-inter")
-        self.plugin_buttons["tk-inter"].grid(column=5, row=2, sticky='w', padx=5, pady=2)
+        self.cbtn_45 = ttk.Checkbutton(self.f_7, variable=self.tk_inter, text="tk-inter")
+        self.cbtn_45.grid(column=5, row=2, sticky='w', padx=5, pady=2)
         
-        self.plugin_vars["transformers"] = tk.IntVar(value=0)
-        self.plugin_buttons["transformers"] = ttk.Checkbutton(self.f_7, variable=self.plugin_vars["transformers"], text="transformers")
-        self.plugin_buttons["transformers"].grid(column=5, row=3, sticky='w', padx=5, pady=2)
+        self.transformers = tk.IntVar(value=0)
+        self.cbtn_46 = ttk.Checkbutton(self.f_7, variable=self.transformers, text="transformers")
+        self.cbtn_46.grid(column=5, row=3, sticky='w', padx=5, pady=2)
         
         # 其余部分保持不变...
         self.help_plugin = """=======================================================================
@@ -1079,9 +1116,12 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             messagebox.showwarning(title='警告', message='没有选中的项目!')
     
     def insert(self, listbox:tk.Listbox, content:tk.StringVar, cache:list):
-        listbox.insert(tk.END, content.get())
-        cache.append(content.get())
-        content.set('')
+        if content.get():
+            listbox.insert(tk.END, content.get())
+            cache.append(content.get())
+            content.set('')
+        else:
+            messagebox.showwarning(title='警告', message='你没有输入任何内容!')
     
     def browse_user_plugin(self):
         f = filedialog.askopenfilename()
@@ -1117,6 +1157,18 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             self.canvas.yview_scroll(1, "units")
         if event.num == 4 or event.delta == 120:   # 向上滚动
             self.canvas.yview_scroll(-1, "units")
+
+    def insert_cascade(self, listbox_0:tk.Listbox, listbox_1:tk.Listbox, cache:dict, var_0:tk.StringVar, var_1:tk.StringVar):
+        src = var_0.get()
+        dst = var_1.get()
+        if src and dst:
+            listbox_0.insert(tk.END, src)
+            listbox_1.insert(tk.END, dst)
+            cache[src] = dst
+            var_0.set('')
+            var_1.set('')
+        else:
+            messagebox.showwarning(title='警告', message='你没有输入任何内容!')
 
 
 if __name__=='__main__':
