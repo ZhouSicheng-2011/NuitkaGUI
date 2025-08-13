@@ -437,7 +437,7 @@ class NuitkaGUI:
         self.frame.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox('all')))
         self.canvas.bind('<Configure>', lambda e: self.canvas.itemconfig(self.frame_id, width=e.width))
         self.canvas.bind_all('<MouseWheel>', self.on_mousewheel)
-        
+        ############################################################
         # 创建包含包数据文件的框架
         self.f_19 = ttk.Labelframe(self.frame, text='包含包数据文件', labelanchor='nw')
         self.f_19.pack(fill='x', padx=10, pady=10)
@@ -478,6 +478,9 @@ class NuitkaGUI:
         list_frame.columnconfigure(0, weight=1)
         list_frame.rowconfigure(0, weight=1)
         self.f_19.columnconfigure(1, weight=1)
+        ###########################################################
+
+        #################################################################
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
