@@ -481,6 +481,21 @@ class NuitkaGUI:
         ###########################################################
 
         #################################################################
+        #不包含数据文件
+        self.f_20 = ttk.Labelframe(self.frame, labelanchor='nw', text='不包含的数据文件模式')
+        self.f_20.pack(fill='x', padx=10, pady=10)
+        #
+        self.lb_22 = ttk.Label(self.f_20, text='不包含的数据文件模式')
+        self.lb_22.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.noinclude_data_files = []
+        self.noinclude_data_files_var = tk.StringVar(value='')
+        self.e_18 = ttk.Entry(self.f_20, textvariable=self.noinclude_data_files_var, width=70)
+        self.e_18.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_16 = ttk.Button(self.f_20, text='添加')
+        self.btn_16.grid(column=2, row=0, padx=5, pady=5)
+        ...
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
