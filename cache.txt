@@ -1,56 +1,56 @@
 ####### raw ###############################################
-f:21, lb:23, e:19, lb:24, e:20, btn:18-20
-list_frame:2, lbox:5, scr:8-9
-list_frame:3, lbox:5, scr:10-11
+f:22, lb:25, e:21, lb:26, e:22, btn:21-23
+list_frame:4, lbox:7, scr:12-13
+list_frame:5, lbox:8, scr:14-15
 ####### raw ###############################################
         ##############################################################################
         #包含的数据文件
-        self.include_onefile_external_data = dict()
-        self.include_onefile_external_data_src = tk.StringVar(value='')
-        self.include_onefile_external_data_dst = tk.StringVar(value='')
+        self.include_data_dir = dict()
+        self.include_data_dir_src = tk.StringVar(value='')
+        self.include_data_dir_dst = tk.StringVar(value='')
         ##
-        self.f_22 = ttk.Labelframe(self.frame, text='包含的单文件外部数据文件', labelanchor='nw')
-        self.f_22.pack(fill='x', padx=10, pady=10)
+        self.f_23 = ttk.Labelframe(self.frame, text='包含的目录', labelanchor='nw')
+        self.f_23.pack(fill='x', padx=10, pady=10)
         #
-        self.lb_25 = ttk.Label(self.f_22, text='包含单文件外部数据文件:')
-        self.lb_25.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
+        self.lb_27 = ttk.Label(self.f_23, text='包含目录:')
+        self.lb_27.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.e_21 = ttk.Entry(self.f_22, textvariable=self.include_onefile_external_data_src, width=40)
-        self.e_21.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
+        self.e_23 = ttk.Entry(self.f_23, textvariable=self.include_data_dir_src, width=40)
+        self.e_23.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.lb_26 = ttk.Label(self.f_22, text='到:')
-        self.lb_26.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
+        self.lb_28 = ttk.Label(self.f_23, text='到:')
+        self.lb_28.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
         #
-        self.e_22 = ttk.Entry(self.f_22, textvariable=self.include_onefile_external_data_dst, width=20)
-        self.e_22.grid(column=3, row=0, padx=5, pady=5, sticky='ew')
+        self.e_24 = ttk.Entry(self.f_23, textvariable=self.include_data_dir_dst, width=20)
+        self.e_24.grid(column=3, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.btn_21 = ttk.Button(self.f_22, text='浏览', command=lambda: self.select_data_file(self.include_onefile_external_data_src))
-        self.btn_21.grid(column=4, row=0, padx=5, pady=5, sticky='ew')
+        self.btn_24 = ttk.Button(self.f_23, text='浏览', command=lambda: self.select_data_file(self.include_data_dir_src))
+        self.btn_24.grid(column=4, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.btn_22 = ttk.Button(self.f_22, text='插入', command=lambda: self.insert_cascade(self.lbox_7, self.lbox_8, self.include_onefile_external_data, self.include_onefile_external_data_src, self.include_onefile_external_data_dst))
-        self.btn_22.grid(column=5, row=0, padx=5, pady=5, sticky='ew')
+        self.btn_25 = ttk.Button(self.f_23, text='插入', command=lambda: self.insert_cascade(self.lbox_9, self.lbox_10, self.include_data_dir, self.include_data_dir_src, self.include_data_dir_dst))
+        self.btn_25.grid(column=5, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.btn_23 = ttk.Button(self.f_22, text='删除选中', command=lambda: self.delete_cascade_selection(self.lbox_7, self.lbox_8, self.include_onefile_external_data))
-        self.btn_23.grid(column=6, row=0, padx=5, pady=5, sticky='ew')
+        self.btn_26 = ttk.Button(self.f_23, text='删除选中', command=lambda: self.delete_cascade_selection(self.lbox_9, self.lbox_10, self.include_data_dir))
+        self.btn_26.grid(column=6, row=0, padx=5, pady=5, sticky='ew')
         ##
-        self.list_frame_4 = ttk.Frame(self.f_22)
-        self.list_frame_4.grid(column=1, row=1, padx=5, pady=5, sticky='nsew')
+        self.list_frame_6 = ttk.Frame(self.f_23)
+        self.list_frame_6.grid(column=1, row=1, padx=5, pady=5, sticky='nsew')
         #
-        self.lbox_7 = tk.Listbox(self.list_frame_4, activestyle='dotbox', font=self.font_0, height=8)
-        self.scr_12 = ttk.Scrollbar(self.list_frame_4, orient='vertical', command=self.lbox_7.yview)
-        self.scr_13 = ttk.Scrollbar(self.list_frame_4, orient='horizontal', command=self.lbox_7.xview)
-        self.lbox_7.config(xscrollcommand=self.scr_13.set, yscrollcommand=self.scr_12.set)
-        self.lbox_7.grid(column=0, row=0, sticky='nsew')
-        self.scr_13.grid(column=0, row=1, sticky='ew')
-        self.scr_12.grid(column=1, row=0, sticky='ns')
+        self.lbox_9 = tk.Listbox(self.list_frame_6, activestyle='dotbox', font=self.font_0, height=8)
+        self.scr_16 = ttk.Scrollbar(self.list_frame_6, orient='vertical', command=self.lbox_9.yview)
+        self.scr_17 = ttk.Scrollbar(self.list_frame_6, orient='horizontal', command=self.lbox_9.xview)
+        self.lbox_9.config(xscrollcommand=self.scr_17.set, yscrollcommand=self.scr_16.set)
+        self.lbox_9.grid(column=0, row=0, sticky='nsew')
+        self.scr_17.grid(column=0, row=1, sticky='ew')
+        self.scr_16.grid(column=1, row=0, sticky='ns')
         #$
-        self.list_frame_5 = ttk.Frame(self.f_22)
-        self.list_frame_5.grid(column=3, row=1, padx=5, pady=5, sticky='nsew')
+        self.list_frame_7 = ttk.Frame(self.f_23)
+        self.list_frame_7.grid(column=3, row=1, padx=5, pady=5, sticky='nsew')
         #
-        self.lbox_8 = tk.Listbox(self.list_frame_5, activestyle='dotbox', height=8)
-        self.scr_14 = ttk.Scrollbar(self.list_frame_5, orient='horizontal', command=self.lbox_8.xview)
-        self.scr_15 = ttk.Scrollbar(self.list_frame_5, orient='vertical', command=self.lbox_8.yview)
-        self.lbox_8.config(xscrollcommand=self.scr_14.set, yscrollcommand=self.scr_15.set)
-        self.lbox_8.grid(column=0, row=0, sticky='nsew')
-        self.scr_14.grid(column=0, row=1, sticky='ew')
-        self.scr_15.grid(column=1, row=0, sticky='ns')
+        self.lbox_10 = tk.Listbox(self.list_frame_7, activestyle='dotbox', height=8)
+        self.scr_18 = ttk.Scrollbar(self.list_frame_7, orient='horizontal', command=self.lbox_10.xview)
+        self.scr_19 = ttk.Scrollbar(self.list_frame_7, orient='vertical', command=self.lbox_10.yview)
+        self.lbox_10.config(xscrollcommand=self.scr_18.set, yscrollcommand=self.scr_19.set)
+        self.lbox_10.grid(column=0, row=0, sticky='nsew')
+        self.scr_18.grid(column=0, row=1, sticky='ew')
+        self.scr_19.grid(column=1, row=0, sticky='ns')

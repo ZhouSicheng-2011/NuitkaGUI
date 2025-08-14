@@ -619,6 +619,58 @@ class NuitkaGUI:
         self.lbox_8.grid(column=0, row=0, sticky='nsew')
         self.scr_14.grid(column=0, row=1, sticky='ew')
         self.scr_15.grid(column=1, row=0, sticky='ns')
+        ##########################################################################
+        ##############################################################################
+        #包含的数据文件
+        self.include_data_dir = dict()
+        self.include_data_dir_src = tk.StringVar(value='')
+        self.include_data_dir_dst = tk.StringVar(value='')
+        ##
+        self.f_23 = ttk.Labelframe(self.frame, text='包含的目录', labelanchor='nw')
+        self.f_23.pack(fill='x', padx=10, pady=10)
+        #
+        self.lb_27 = ttk.Label(self.f_23, text='包含目录:')
+        self.lb_27.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.e_23 = ttk.Entry(self.f_23, textvariable=self.include_data_dir_src, width=40)
+        self.e_23.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.lb_28 = ttk.Label(self.f_23, text='到:')
+        self.lb_28.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
+        #
+        self.e_24 = ttk.Entry(self.f_23, textvariable=self.include_data_dir_dst, width=20)
+        self.e_24.grid(column=3, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_24 = ttk.Button(self.f_23, text='浏览', command=lambda: self.select_data_dir(self.include_data_dir_src))
+        self.btn_24.grid(column=4, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_25 = ttk.Button(self.f_23, text='插入', command=lambda: self.insert_cascade(self.lbox_9, self.lbox_10, self.include_data_dir, self.include_data_dir_src, self.include_data_dir_dst))
+        self.btn_25.grid(column=5, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_26 = ttk.Button(self.f_23, text='删除选中', command=lambda: self.delete_cascade_selection(self.lbox_9, self.lbox_10, self.include_data_dir))
+        self.btn_26.grid(column=6, row=0, padx=5, pady=5, sticky='ew')
+        ##
+        self.list_frame_6 = ttk.Frame(self.f_23)
+        self.list_frame_6.grid(column=1, row=1, padx=5, pady=5, sticky='nsew')
+        #
+        self.lbox_9 = tk.Listbox(self.list_frame_6, activestyle='dotbox', font=self.font_0, height=8)
+        self.scr_16 = ttk.Scrollbar(self.list_frame_6, orient='vertical', command=self.lbox_9.yview)
+        self.scr_17 = ttk.Scrollbar(self.list_frame_6, orient='horizontal', command=self.lbox_9.xview)
+        self.lbox_9.config(xscrollcommand=self.scr_17.set, yscrollcommand=self.scr_16.set)
+        self.lbox_9.grid(column=0, row=0, sticky='nsew')
+        self.scr_17.grid(column=0, row=1, sticky='ew')
+        self.scr_16.grid(column=1, row=0, sticky='ns')
+        #$
+        self.list_frame_7 = ttk.Frame(self.f_23)
+        self.list_frame_7.grid(column=3, row=1, padx=5, pady=5, sticky='nsew')
+        #
+        self.lbox_10 = tk.Listbox(self.list_frame_7, activestyle='dotbox', height=8)
+        self.scr_18 = ttk.Scrollbar(self.list_frame_7, orient='horizontal', command=self.lbox_10.xview)
+        self.scr_19 = ttk.Scrollbar(self.list_frame_7, orient='vertical', command=self.lbox_10.yview)
+        self.lbox_10.config(xscrollcommand=self.scr_18.set, yscrollcommand=self.scr_19.set)
+        self.lbox_10.grid(column=0, row=0, sticky='nsew')
+        self.scr_18.grid(column=0, row=1, sticky='ew')
+        self.scr_19.grid(column=1, row=0, sticky='ns')
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
@@ -1334,6 +1386,12 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             cache.pop(item_1)
         else:
             messagebox.showwarning(title='警告', message='你没有选中任何项目')
+    
+    def select_data_dir(self, var:tk.StringVar):
+        f = filedialog.askdirectory(mustexist=True)
+        if f:
+            fn = f.replace('\\', '/')
+            var.set(fn)
 
 
 if __name__=='__main__':
