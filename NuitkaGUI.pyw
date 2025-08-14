@@ -519,7 +519,8 @@ class NuitkaGUI:
         ##############################################################################
         #包含的数据文件
         self.include_data_files = dict()
-        self.include_data_files_var = tk.StringVar(value='')
+        self.include_data_files_src = tk.StringVar(value='')
+        self.include_data_files_dst = tk.StringVar(value='')
         ##
         self.f_21 = ttk.Labelframe(self.frame, text='包含的数据文件', labelanchor='nw')
         self.f_21.pack(fill='x', padx=10, pady=10)
@@ -527,11 +528,45 @@ class NuitkaGUI:
         self.lb_23 = ttk.Label(self.f_21, text='包含数据文件:')
         self.lb_23.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.e_19 = ttk.Entry(self.f_21, textvariable=self.include_data_files_var, width=40)
+        self.e_19 = ttk.Entry(self.f_21, textvariable=self.include_data_files_src, width=40)
         self.e_19.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
         #
         self.lb_24 = ttk.Label(self.f_21, text='到:')
         self.lb_24.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
+        #
+        self.e_20 = ttk.Entry(self.f_21, textvariable=self.include_data_files_dst, width=20)
+        self.e_20.grid(column=3, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_18 = ttk.Button(self.f_21, text='浏览', command=lambda: self.select_data_file(self.include_data_files_src))
+        self.btn_18.grid(column=4, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_19 = ttk.Button(self.f_21, text='插入', command=lambda: self.insert_cascade(self.lbox_5, self.lbox_6, self.include_data_files, self.include_data_files_src, self.include_data_files_dst))
+        self.btn_19.grid(column=5, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_20 = ttk.Button(self.f_21, text='删除选中', command=lambda: self.delete_cascade_selection(self.lbox_5, self.lbox_6, self.include_data_files))
+        self.btn_20.grid(column=6, row=0, padx=5, pady=5, sticky='ew')
+        ##
+        self.list_frame_2 = ttk.Frame(self.f_21)
+        self.list_frame_2.grid(column=1, row=1, padx=5, pady=5, sticky='nsew')
+        #
+        self.lbox_5 = tk.Listbox(self.list_frame_2, activestyle='dotbox', font=self.font_0, height=8)
+        self.scr_8 = ttk.Scrollbar(self.list_frame_2, orient='vertical', command=self.lbox_5.yview)
+        self.scr_9 = ttk.Scrollbar(self.list_frame_2, orient='horizontal', command=self.lbox_5.xview)
+        self.lbox_5.config(xscrollcommand=self.scr_9.set, yscrollcommand=self.scr_8.set)
+        self.lbox_5.grid(column=0, row=0, sticky='nsew')
+        self.scr_9.grid(column=0, row=1, sticky='ew')
+        self.scr_8.grid(column=1, row=0, sticky='ns')
+        #$
+        self.list_frame_3 = ttk.Frame(self.f_21)
+        self.list_frame_3.grid(column=3, row=1, padx=5, pady=5, sticky='nsew')
+        #
+        self.lbox_6 = tk.Listbox(self.list_frame_3, activestyle='dotbox', height=8)
+        self.scr_10 = ttk.Scrollbar(self.list_frame_3, orient='horizontal', command=self.lbox_6.xview)
+        self.scr_11 = ttk.Scrollbar(self.list_frame_3, orient='vertical', command=self.lbox_6.yview)
+        self.lbox_6.config(xscrollcommand=self.scr_10.set, yscrollcommand=self.scr_11.set)
+        self.lbox_6.grid(column=0, row=0, sticky='nsew')
+        self.scr_10.grid(column=0, row=1, sticky='ew')
+        self.scr_11.grid(column=1, row=0, sticky='ns')
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
@@ -1223,6 +1258,30 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             var_1.set('')
         else:
             messagebox.showwarning(title='警告', message='你没有输入任何内容!')
+
+    def select_data_file(self, var:tk.StringVar):
+        f = filedialog.askopenfilename(filetypes=[('所有数据文件', '*.*')])
+        if f:
+            fn = f.replace('\\', '/')
+            var.set(fn)
+
+    def delete_cascade_selection(self, listbox_1:tk.Listbox, listbox_2:tk.Listbox, cache:dict):
+        s1 = listbox_1.curselection()
+        s2 = listbox_2.curselection()
+        if s1:
+            item_1 = listbox_1.get(s1)
+            #item_2 = listbox_2.get(s1)
+            listbox_1.delete(s1)
+            listbox_2.delete(s1)
+            cache.pop(item_1)
+        elif s2:
+            item_1 = listbox_1.get(s2)
+            #item_2 = listbox_2.get(s2)
+            listbox_1.delete(s2)
+            listbox_2.delete(s2)
+            cache.pop(item_1)
+        else:
+            messagebox.showwarning(title='警告', message='你没有选中任何项目')
 
 
 if __name__=='__main__':
