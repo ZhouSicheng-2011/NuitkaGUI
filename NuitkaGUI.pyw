@@ -528,13 +528,13 @@ class NuitkaGUI:
         self.lb_23 = ttk.Label(self.f_21, text='包含数据文件:')
         self.lb_23.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.e_19 = ttk.Entry(self.f_21, textvariable=self.include_data_files_src, width=40)
+        self.e_19 = ttk.Entry(self.f_21, textvariable=self.include_data_files_src, width=60)
         self.e_19.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
         #
         self.lb_24 = ttk.Label(self.f_21, text='到:')
         self.lb_24.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
         #
-        self.e_20 = ttk.Entry(self.f_21, textvariable=self.include_data_files_dst, width=20)
+        self.e_20 = ttk.Entry(self.f_21, textvariable=self.include_data_files_dst, width=25)
         self.e_20.grid(column=3, row=0, padx=5, pady=5, sticky='ew')
         #
         self.btn_18 = ttk.Button(self.f_21, text='浏览', command=lambda: self.select_data_file(self.include_data_files_src))
@@ -549,7 +549,7 @@ class NuitkaGUI:
         self.list_frame_2 = ttk.Frame(self.f_21)
         self.list_frame_2.grid(column=1, row=1, padx=5, pady=5, sticky='nsew')
         #
-        self.lbox_5 = tk.Listbox(self.list_frame_2, activestyle='dotbox', font=self.font_0, height=8, width=40)
+        self.lbox_5 = tk.Listbox(self.list_frame_2, activestyle='dotbox', font=self.font_0, height=8, width=60)
         self.scr_8 = ttk.Scrollbar(self.list_frame_2, orient='vertical', command=self.lbox_5.yview)
         self.scr_9 = ttk.Scrollbar(self.list_frame_2, orient='horizontal', command=self.lbox_5.xview)
         self.lbox_5.config(xscrollcommand=self.scr_9.set, yscrollcommand=self.scr_8.set)
@@ -560,7 +560,7 @@ class NuitkaGUI:
         self.list_frame_3 = ttk.Frame(self.f_21)
         self.list_frame_3.grid(column=3, row=1, padx=5, pady=5, sticky='nsew')
         #
-        self.lbox_6 = tk.Listbox(self.list_frame_3, activestyle='dotbox', height=8)
+        self.lbox_6 = tk.Listbox(self.list_frame_3, activestyle='dotbox', height=8, width=25)
         self.scr_10 = ttk.Scrollbar(self.list_frame_3, orient='horizontal', command=self.lbox_6.xview)
         self.scr_11 = ttk.Scrollbar(self.list_frame_3, orient='vertical', command=self.lbox_6.yview)
         self.lbox_6.config(xscrollcommand=self.scr_10.set, yscrollcommand=self.scr_11.set)
@@ -569,7 +569,7 @@ class NuitkaGUI:
         self.scr_11.grid(column=1, row=0, sticky='ns')
         ######################################################################
         ##############################################################################
-        #包含的数据文件
+        #包含的单文件外部数据文件
         self.include_onefile_external_data = dict()
         self.include_onefile_external_data_src = tk.StringVar(value='')
         self.include_onefile_external_data_dst = tk.StringVar(value='')
@@ -580,13 +580,13 @@ class NuitkaGUI:
         self.lb_25 = ttk.Label(self.f_22, text='包含单文件外部数据文件:')
         self.lb_25.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.e_21 = ttk.Entry(self.f_22, textvariable=self.include_onefile_external_data_src, width=40)
+        self.e_21 = ttk.Entry(self.f_22, textvariable=self.include_onefile_external_data_src, width=60)
         self.e_21.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
         #
         self.lb_26 = ttk.Label(self.f_22, text='到:')
         self.lb_26.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
         #
-        self.e_22 = ttk.Entry(self.f_22, textvariable=self.include_onefile_external_data_dst, width=20)
+        self.e_22 = ttk.Entry(self.f_22, textvariable=self.include_onefile_external_data_dst, width=25)
         self.e_22.grid(column=3, row=0, padx=5, pady=5, sticky='ew')
         #
         self.btn_21 = ttk.Button(self.f_22, text='浏览', command=lambda: self.select_data_file(self.include_onefile_external_data_src))
@@ -601,7 +601,7 @@ class NuitkaGUI:
         self.list_frame_4 = ttk.Frame(self.f_22)
         self.list_frame_4.grid(column=1, row=1, padx=5, pady=5, sticky='nsew')
         #
-        self.lbox_7 = tk.Listbox(self.list_frame_4, activestyle='dotbox', font=self.font_0, height=8, width=40)
+        self.lbox_7 = tk.Listbox(self.list_frame_4, activestyle='dotbox', font=self.font_0, height=8, width=60)
         self.scr_12 = ttk.Scrollbar(self.list_frame_4, orient='vertical', command=self.lbox_7.yview)
         self.scr_13 = ttk.Scrollbar(self.list_frame_4, orient='horizontal', command=self.lbox_7.xview)
         self.lbox_7.config(xscrollcommand=self.scr_13.set, yscrollcommand=self.scr_12.set)
@@ -612,7 +612,7 @@ class NuitkaGUI:
         self.list_frame_5 = ttk.Frame(self.f_22)
         self.list_frame_5.grid(column=3, row=1, padx=5, pady=5, sticky='nsew')
         #
-        self.lbox_8 = tk.Listbox(self.list_frame_5, activestyle='dotbox', height=8)
+        self.lbox_8 = tk.Listbox(self.list_frame_5, activestyle='dotbox', height=8, width=25)
         self.scr_14 = ttk.Scrollbar(self.list_frame_5, orient='horizontal', command=self.lbox_8.xview)
         self.scr_15 = ttk.Scrollbar(self.list_frame_5, orient='vertical', command=self.lbox_8.yview)
         self.lbox_8.config(xscrollcommand=self.scr_14.set, yscrollcommand=self.scr_15.set)
@@ -621,7 +621,7 @@ class NuitkaGUI:
         self.scr_15.grid(column=1, row=0, sticky='ns')
         ##########################################################################
         ##############################################################################
-        #包含的数据文件
+        #包含的数据目录
         self.include_data_dir = dict()
         self.include_data_dir_src = tk.StringVar(value='')
         self.include_data_dir_dst = tk.StringVar(value='')
@@ -632,13 +632,13 @@ class NuitkaGUI:
         self.lb_27 = ttk.Label(self.f_23, text='包含目录:')
         self.lb_27.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
         #
-        self.e_23 = ttk.Entry(self.f_23, textvariable=self.include_data_dir_src, width=40)
+        self.e_23 = ttk.Entry(self.f_23, textvariable=self.include_data_dir_src, width=60)
         self.e_23.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
         #
         self.lb_28 = ttk.Label(self.f_23, text='到:')
         self.lb_28.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
         #
-        self.e_24 = ttk.Entry(self.f_23, textvariable=self.include_data_dir_dst, width=20)
+        self.e_24 = ttk.Entry(self.f_23, textvariable=self.include_data_dir_dst, width=25)
         self.e_24.grid(column=3, row=0, padx=5, pady=5, sticky='ew')
         #
         self.btn_24 = ttk.Button(self.f_23, text='浏览', command=lambda: self.select_data_dir(self.include_data_dir_src))
@@ -653,7 +653,7 @@ class NuitkaGUI:
         self.list_frame_6 = ttk.Frame(self.f_23)
         self.list_frame_6.grid(column=1, row=1, padx=5, pady=5, sticky='nsew')
         #
-        self.lbox_9 = tk.Listbox(self.list_frame_6, activestyle='dotbox', font=self.font_0, height=8)
+        self.lbox_9 = tk.Listbox(self.list_frame_6, activestyle='dotbox', font=self.font_0, height=8, width=60)
         self.scr_16 = ttk.Scrollbar(self.list_frame_6, orient='vertical', command=self.lbox_9.yview)
         self.scr_17 = ttk.Scrollbar(self.list_frame_6, orient='horizontal', command=self.lbox_9.xview)
         self.lbox_9.config(xscrollcommand=self.scr_17.set, yscrollcommand=self.scr_16.set)
@@ -664,13 +664,65 @@ class NuitkaGUI:
         self.list_frame_7 = ttk.Frame(self.f_23)
         self.list_frame_7.grid(column=3, row=1, padx=5, pady=5, sticky='nsew')
         #
-        self.lbox_10 = tk.Listbox(self.list_frame_7, activestyle='dotbox', height=8)
+        self.lbox_10 = tk.Listbox(self.list_frame_7, activestyle='dotbox', height=8, width=25)
         self.scr_18 = ttk.Scrollbar(self.list_frame_7, orient='horizontal', command=self.lbox_10.xview)
         self.scr_19 = ttk.Scrollbar(self.list_frame_7, orient='vertical', command=self.lbox_10.yview)
         self.lbox_10.config(xscrollcommand=self.scr_18.set, yscrollcommand=self.scr_19.set)
         self.lbox_10.grid(column=0, row=0, sticky='nsew')
         self.scr_18.grid(column=0, row=1, sticky='ew')
         self.scr_19.grid(column=1, row=0, sticky='ns')
+        ######################################################################
+        ##############################################################################
+        #包含的原始数据目录
+        self.include_raw_dir = dict()
+        self.include_raw_dir_src = tk.StringVar(value='')
+        self.include_raw_dir_dst = tk.StringVar(value='')
+        ##
+        self.f_25 = ttk.Labelframe(self.frame, text='包含的原始目录(权限不变)', labelanchor='nw')
+        self.f_25.pack(fill='x', padx=10, pady=10)
+        #
+        self.lb_29 = ttk.Label(self.f_25, text='包含原始目录:')
+        self.lb_29.grid(column=0, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.e_25 = ttk.Entry(self.f_25, textvariable=self.include_raw_dir_src, width=60)
+        self.e_25.grid(column=1, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.lb_30 = ttk.Label(self.f_25, text='到:')
+        self.lb_30.grid(column=2, row=0, padx=2, pady=2, sticky='ew')
+        #
+        self.e_26 = ttk.Entry(self.f_25, textvariable=self.include_raw_dir_dst, width=25)
+        self.e_26.grid(column=3, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_27 = ttk.Button(self.f_25, text='浏览', command=lambda: self.select_data_dir(self.include_raw_dir_src))
+        self.btn_27.grid(column=4, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_28 = ttk.Button(self.f_25, text='插入', command=lambda: self.insert_cascade(self.lbox_11, self.lbox_12, self.include_raw_dir, self.include_raw_dir_src, self.include_raw_dir_dst))
+        self.btn_28.grid(column=5, row=0, padx=5, pady=5, sticky='ew')
+        #
+        self.btn_29 = ttk.Button(self.f_25, text='删除选中', command=lambda: self.delete_cascade_selection(self.lbox_11, self.lbox_12, self.include_raw_dir))
+        self.btn_29.grid(column=6, row=0, padx=5, pady=5, sticky='ew')
+        ##
+        self.list_frame_8 = ttk.Frame(self.f_25)
+        self.list_frame_8.grid(column=1, row=1, padx=5, pady=5, sticky='nsew')
+        #
+        self.lbox_11 = tk.Listbox(self.list_frame_8, activestyle='dotbox', font=self.font_0, height=8, width=60)
+        self.scr_20 = ttk.Scrollbar(self.list_frame_8, orient='vertical', command=self.lbox_11.yview)
+        self.scr_21 = ttk.Scrollbar(self.list_frame_8, orient='horizontal', command=self.lbox_11.xview)
+        self.lbox_11.config(xscrollcommand=self.scr_21.set, yscrollcommand=self.scr_20.set)
+        self.lbox_11.grid(column=0, row=0, sticky='nsew')
+        self.scr_21.grid(column=0, row=1, sticky='ew')
+        self.scr_20.grid(column=1, row=0, sticky='ns')
+        #$
+        self.list_frame_9 = ttk.Frame(self.f_25)
+        self.list_frame_9.grid(column=3, row=1, padx=5, pady=5, sticky='nsew')
+        #
+        self.lbox_12 = tk.Listbox(self.list_frame_9, activestyle='dotbox', height=8, width=25)
+        self.scr_22 = ttk.Scrollbar(self.list_frame_9, orient='horizontal', command=self.lbox_12.xview)
+        self.scr_23 = ttk.Scrollbar(self.list_frame_9, orient='vertical', command=self.lbox_12.yview)
+        self.lbox_12.config(xscrollcommand=self.scr_22.set, yscrollcommand=self.scr_23.set)
+        self.lbox_12.grid(column=0, row=0, sticky='nsew')
+        self.scr_22.grid(column=0, row=1, sticky='ew')
+        self.scr_23.grid(column=1, row=0, sticky='ns')
 
     def dll_tab(self):
         self.tab_4 = ttk.Frame(self.notebook)
