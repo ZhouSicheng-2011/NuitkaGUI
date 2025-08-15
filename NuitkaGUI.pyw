@@ -26,6 +26,7 @@ class NuitkaGUI:
         self.root = tk.Tk()
         self.root.title('Nuitka打包工具')
         self.root.geometry('1300x900+50+50')
+        self.root.resizable(False, False)
 
         self.theme = 'vista' if platform.system()=='Windows' else 'clam'
 
@@ -48,9 +49,7 @@ class NuitkaGUI:
 
         self.notebook = ttk.Notebook(self.root)
         self.notebook.place(x=20,y=200,width=1260,height=580)
-        #创建线程通信队列
-        #self.exc_space = queue.Queue()
-
+        
         self.simple()
 
         #创建所有标签页
@@ -77,7 +76,7 @@ class NuitkaGUI:
 
         self.console.config(state='disabled')
         self.stat = ttk.Frame(self.root)
-        self.stat.place(x=20, y=800, width=1260, height=90)
+        self.stat.place(x=20, y=800, width=1260, height=100)
         self.status()
 
         self.root.mainloop()
@@ -1080,8 +1079,8 @@ class NuitkaGUI:
         self.f_7.place(x=20, y=20, width=1220, height=200)
         
         # 为每个插件创建独立的IntVar和Checkbutton
-        self.plugin_vars = {}
-        self.plugin_buttons = {}
+        #self.plugin_vars = {}
+        #self.plugin_buttons = {}
         
         # 第1列
         self.anti_bloat = tk.IntVar(value=0)
@@ -1279,8 +1278,13 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
     '''
 
     def status(self):
-        self.left = ttk.Frame(self.stat)
-        self.left.pack(side='left',fill='both',expand=True)
+        self.command = scrolledtext.ScrolledText(self.stat, font=self.font_0)
+        self.command.place(x=0, y=0, width=800, height=100)
+        #
+        self.right = ttk.Frame(self.stat)
+        self.right.place(x=800, y=0, width=460, height=100)
+        #
+        ...
     
     def get_system_info(self):   #Just on Linux
         try:
@@ -1444,6 +1448,92 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         if f:
             fn = f.replace('\\', '/')
             var.set(fn)
+
+    def get_command(self):
+        if not self.interpreter.get():
+            messagebox.showerror(title='错误', message='你没有选择Python解释器!')
+            return
+        
+        if not self.script.get():
+            messagebox.showerror(title='错误', message='你没有选择Python脚本!')
+            return
+        
+        #基本内容
+        cmd = []
+        cmd.append(self.interpreter.get())
+        cmd.append('-m')
+        cmd.append('nuitka')
+        cmd.append(f'--main={self.script.get()}')
+        cmd.append(f'--mode={self.mode.get()}')
+
+        if self.py_dbg.get():
+            cmd.append('--python-debug')
+        
+        if self.var_dont_write_bytecode.get():
+            cmd.append('--python-flag=dont_write_bytecode')
+        
+        if self.var_isolated.get():
+            cmd.append('--python-flag=isolated')
+
+        if self.var_main.get():
+            cmd.append('--python-flag=main')
+        
+        if self.var_no_asserts.get():
+            cmd.append('--python-flag=no_asserts')
+
+        if self.var_no_docstrings.get():
+            cmd.append('--python-flag=no_docstrings')
+        
+        if self.var_no_site.get():
+            cmd.append('--python-flag=no_site')
+
+        if self.var_no_warnings.get():
+            cmd.append('--python-flag=no_warnings')
+        
+        if self.var_safe_path.get():
+            cmd.append('--python-flag=safe_path')
+
+        if self.var_static_hashes.get():
+            cmd.append('--python-flag=static_hashes')
+        
+        if self.var_unbuffered.get():
+            cmd.append('--python-flag=unbuffered')
+
+        ##
+        #包控制
+        if self.prefer_source_code.get():
+            cmd.append('--prefer-source-code')
+        
+        if self.includes_content.get('include_package'):
+            for p in self.includes_content['include_package']:
+                cmd.append(f'--include-package={p}')
+            del p
+        
+        if self.includes_content.get('include_module'):
+            for p in self.includes_content['include_module']:
+                cmd.append(f'--include-module={p}')
+            del p
+
+        if self.includes_content.get('include_plugin_directory'):
+            for p in self.includes_content['include_plugin_directory']:
+                cmd.append(f'--include-plugin-directory={p}')
+            del p
+        
+        if self.includes_content.get('include_plugin_files'):
+            for p in self.includes_content['include_plugin_files']:
+                cmd.append(f'--include-plugin-files={p}')
+            del p
+
+        ##
+        #导入控制
+        if self.follow_imports.get():
+            cmd.append('--follow-imports')
+        
+        if self.follow_stdlib.get():
+            cmd.append('--follow-stdlib')
+        
+        ...
+
 
 
 if __name__=='__main__':
