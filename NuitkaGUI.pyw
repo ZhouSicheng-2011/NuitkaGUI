@@ -1526,13 +1526,58 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
 
         ##
         #导入控制
-        if self.follow_imports.get():
-            cmd.append('--follow-imports')
+        if not self.no_follow_imports:
+            if self.follow_imports.get():
+                cmd.append('--follow-imports')
+            
+            if self.follow_stdlib.get():
+                cmd.append('--follow-stdlib')
+            
+            if self.follow_imports_list:
+                for l in self.follow_imports_list:
+                    cmd.append(f'--follow-import-to={l}')
+                del l
+            
+            if self.no_follow_imports_list:
+                for l in self.no_follow_imports_list:
+                    cmd.append(f'--nofollow-import-to={l}')
+                del l
+        else:
+            cmd.append('--nofollow-imports')
+
+        ##
+        #单文件选项
+        if self.onefile_as_archive:
+            cmd.append('--onefile-as-archive')
+
+        if self.onefile_no_compression:
+            cmd.append('--onefile-no-compression')
         
-        if self.follow_stdlib.get():
-            cmd.append('--follow-stdlib')
+        if self.onefile_no_dll:
+            cmd.append('--onefile-no-dll')
         
-        ...
+        if self.onefile_child_grace.get() != 5000:
+            cmd.append(f'--onefile-child-grace={self.onefile_child_grace}')
+        
+        if self.onefile_cache_mode.get() != 'auto':
+            cmd.append(f'--onefile-cache-mode={self.onefile_cache_mode.get()}')
+        
+        ##
+        #数据文件选项
+        if self.include_data_dir:
+            for k,v in self.include_data_dir.items():
+                cmd.append(f'--include-data-dir={k}={v}')
+            del k,v
+        
+        if self.include_data_files:
+            for k,v in self.include_data_files.items():
+                cmd.append(f'--include-data-files={k}={v}')
+            del k,v
+        
+        if self.include_raw_dir:
+            for k,v in self.include_raw_dir.items():
+                cmd.append(f'--include-raw-dir={k}={v}')
+            del k,v
 
 
 
