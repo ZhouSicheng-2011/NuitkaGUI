@@ -943,7 +943,10 @@ class NuitkaGUI:
         self.rbtn_12 = ttk.Radiobutton(self.f_12, variable=self.C_complier, value='msvc',\
                                        text='MSVC编译器(下面填写版本)')
         self.rbtn_12.pack(anchor='w', fill='y')
+        #$
+        self.msvc_version = tk.StringVar(value='latest')
         self.cbox_0 = ttk.Combobox(self.f_12, values=['latest'], state='normal')
+        self.cbox_0.bind('<<ComboboxSelected>>', lambda e: self.msvc_version.set(self.cbox_0.get()))
         self.cbox_0.pack(anchor='w', fill='y')
         #
         self.f_13 = ttk.Labelframe(self.tab_11, text='加速与优化', labelanchor='nw')
@@ -1684,7 +1687,47 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         #C编译器选项
         match self.C_complier.get():
             case 'msvc':
-                ...
+                cmd.append(f'--msvc={self.msvc_version.get()}')
+            case 'mingw64':
+                cmd.append('--mingw64')
+            case 'clang':
+                cmd.append('--clang')
+        
+        if self.jobs.get() != '0':
+            cmd.append(f'--jobs={self.jobs.get()}')
+        
+        if self.lto.get() != 'auto':
+            cmd.append(f'--lto={self.lto.get()}')
+        
+        ##
+        #系统特定选项
+        cmd.append(f'--windows-console-mode={self.windows_console_mode.get()}')
+        
+        if self.windows_uac_admin.get():
+            cmd.append('--windows-uac-admin')
+        
+        if self.windows_icon_from_ico:
+            for i in self.windows_icon_from_ico:
+                cmd.append(f'--windows-icon-from-ico={i}')
+        
+        if self.linux_icon.get():
+            cmd.append(f'--linux-icon={self.linux_icon.get()}')
+        ##
+        #软件信息选项
+        if self.company_name_var.get():
+            cmd.append(f'--company-name={self.company_name_var.get()}')
+        
+        if self.product_name_var.get():
+            cmd.append(f'--product-name={self.product_name_var.get()}')
+        
+        if self.file_version_var.get():
+            cmd.append(f'--file-version={self.file_version_var.get()}')
+        
+        if self.product_version_var.get():
+            cmd.append(f'--product-version={self.product_version_var.get()}')
+        
+        if self.copyright_text_var.get():
+            cmd.append(f'--copyright-text={self.copyright_text_var.get()}')
 
 
 
