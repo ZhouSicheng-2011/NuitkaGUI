@@ -1728,6 +1728,19 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         
         if self.copyright_text_var.get():
             cmd.append(f'--copyright-text={self.copyright_text_var.get()}')
+        
+        ##
+        #插件选项
+        for p in self.plugins:
+            plugin = p.replace('-', '_')
+            if getattr(self, plugin):
+                cmd.append(f'--enable-plugins={p}')
+        
+        if self.user_plugin.get():
+            cmd.append(f'--user-plugin={self.user_plugin.get()}')
+        
+        ##################大功告成!!!#########################
+        ##################最后, 只剩一点!!!###################
 
 
 
