@@ -1507,22 +1507,22 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         if self.includes_content.get('include_package'):
             for p in self.includes_content['include_package']:
                 cmd.append(f'--include-package={p}')
-            del p
+            #del p
         
         if self.includes_content.get('include_module'):
             for p in self.includes_content['include_module']:
                 cmd.append(f'--include-module={p}')
-            del p
+            #del p
 
         if self.includes_content.get('include_plugin_directory'):
             for p in self.includes_content['include_plugin_directory']:
                 cmd.append(f'--include-plugin-directory={p}')
-            del p
+            #del p
         
         if self.includes_content.get('include_plugin_files'):
             for p in self.includes_content['include_plugin_files']:
                 cmd.append(f'--include-plugin-files={p}')
-            del p
+            #del p
 
         ##
         #导入控制
@@ -1536,12 +1536,12 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             if self.follow_imports_list:
                 for l in self.follow_imports_list:
                     cmd.append(f'--follow-import-to={l}')
-                del l
+                #
             
             if self.no_follow_imports_list:
                 for l in self.no_follow_imports_list:
                     cmd.append(f'--nofollow-import-to={l}')
-                del l
+                #
         else:
             cmd.append('--nofollow-imports')
 
@@ -1567,17 +1567,44 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         if self.include_data_dir:
             for k,v in self.include_data_dir.items():
                 cmd.append(f'--include-data-dir={k}={v}')
-            del k,v
+            #
         
         if self.include_data_files:
             for k,v in self.include_data_files.items():
                 cmd.append(f'--include-data-files={k}={v}')
-            del k,v
+            #
         
         if self.include_raw_dir:
             for k,v in self.include_raw_dir.items():
                 cmd.append(f'--include-raw-dir={k}={v}')
-            del k,v
+            #
+        
+        if self.include_onefile_external_data:
+            for k,v in self.include_onefile_external_data.items():
+                cmd.append(f'--include-onefile-external-data={k}={v}')
+            #
+        
+        if self.include_package_data:
+            for k in self.include_package_data:
+                cmd.append(f'--include-package-data={k}')
+            #
+        
+        if self.noinclude_data_files:
+            for k in self.noinclude_data_files:
+                cmd.append(f'--noinclude-data-files={k}')
+        
+        ##
+        #DLL控制
+        if self.list_package_dlls.get():
+            cmd.append(f'--list-package-dlls={self.list_package_dlls.get()}')
+        
+        if self.noinclude_dlls.get():
+            cmd.append(f'--noinclude-dlls={self.noinclude_dlls.get()}')
+        
+        if self.list_package_exe.get():
+            cmd.append(f'--list-package-exe={self.list_package_exe.get()}')
+        
+        ##
 
 
 
