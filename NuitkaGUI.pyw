@@ -801,7 +801,7 @@ class NuitkaGUI:
         #
         self.lb_14 = ttk.Label(self.tab_7, text='选择__file__变量的值:')
         self.lb_14.grid(column=0, row=1, sticky='e')
-        self.file_reference_choice = tk.StringVar(value='runtime')
+        self.file_reference_choice = tk.StringVar(value='')
         self.cbox_2 = ttk.Combobox(self.tab_7, values=['runtime','original','frozen'],\
                                    state='readonly', width=20)
         self.cbox_2.bind('<<ComboboxSelected>>', lambda event:self.file_reference_choice.set(self.cbox_2.get()))
@@ -809,7 +809,7 @@ class NuitkaGUI:
         #
         self.lb_15 = ttk.Label(self.tab_7, text='选择__name__变量和__package__变量的值:')
         self.lb_15.grid(column=0, row=2, sticky='e')
-        self.module_name_choice = tk.StringVar(value='runtime')
+        self.module_name_choice = tk.StringVar(value='')
         self.cbox_3 = ttk.Combobox(self.tab_7, values=['runtime', 'original'],\
                                     state='readonly', width=20)
         self.cbox_3.bind('<<ComboboxSelected>>', lambda event:self.module_name_choice.set(self.cbox_3.get()))
@@ -1605,6 +1605,87 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             cmd.append(f'--list-package-exe={self.list_package_exe.get()}')
         
         ##
+        #警告控制
+        if self.warn_implicit_exception.get():
+            cmd.append('--warn-implicit-exception')
+        
+        if self.warn_unusual_code.get():
+            cmd.append('--warn-unusual-code')
+        
+        if self.assume_yes_for_downloads.get():
+            cmd.append('--assume-yes-for-downloads')
+        
+        if self.nowarn_mnemonic.get():
+            cmd.append(f'--nowarn-mnemonic={self.nowarn_mnemonic.get()}')
+        
+        ##
+        #运行选项
+        if self.run.get():
+            cmd.append('--run')
+        
+        if self.debugger.get():
+            cmd.append('--debugger')
+        
+        ##
+        #编译选项
+        if self.user_package_configuration.get():
+            cmd.append(f'--user-package-configuration={self.user_package_configuration.get()}')
+        
+        if self.full_compat.get():
+            cmd.append('--full-compat')
+        
+        if self.file_reference_choice.get():
+            cmd.append(f'--file-reference-choice={self.file_reference_choice.get()}')
+        
+        if self.module_name_choice.get():
+            cmd.append(f'--module-name-choice={self.module_name_choice.get()}')
+        
+        ##
+        #输出选项
+        if self.no_pyi_file.get():
+            cmd.append('--no-pyi-file')
+        
+        if self.remove_output.get():
+            cmd.append('--remove-output')
+        
+        if self.output_dir.get():
+            cmd.append(f'--output-dir={self.output_dir.get()}')
+        
+        if self.output_filename.get():
+            cmd.append(f'--output-filename={self.output_filename.get()}')
+        
+        ##
+        #部署选项
+        if self.deployment.get() == 2:
+            cmd.append('--deployment')
+        elif self.deployment.get() == 1:
+            cmd.append(f'--no-deployment-flag={self.no_deployment_flag.get()}')
+        else:
+            pass
+
+        ##
+        #调试选项
+        if self.unstripped.get():
+            cmd.append('--unstripped')
+        
+        if self.debug.get():
+            cmd.append('--debug')
+        
+        if self.trace_execution.get():
+            cmd.append('--trace-execution')
+        
+        if self.xml_filename.get():
+            cmd.append(f'--xml={self.xml_filename.get()}')
+        
+        if self.low_memory.get():
+            cmd.append('--low-memory')
+        
+        ##
+        #C编译器选项
+        match self.C_complier.get():
+            case 'msvc':
+                ...
+
 
 
 
