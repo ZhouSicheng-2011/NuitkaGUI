@@ -42,7 +42,7 @@ class NuitkaGUI:
         self.style.configure("TCheckbutton", background="#f0f0f0", font=('Consolas', 10))
         self.style.configure("TRadiobutton", background="#f0f0f0", font=('Consolas', 10))
         self.style.configure("TListbox", font=('Consolas', 10))
-        self.style.configure("TSpinbox", font=('Consolas', 10))
+        #self.style.configure("TSpinbox", font=('Consolas', 10))
         
         self.main = ttk.LabelFrame(self.root,labelanchor='nw',text='基础选项')
         self.main.place(x=20,y=20,width=1260,height=160)
@@ -72,7 +72,7 @@ class NuitkaGUI:
         #self.test_tab()
         self.console_tab()
 
-        ...
+        #...
 
         self.console.config(state='disabled')
         self.stat = ttk.Frame(self.root)
@@ -183,7 +183,7 @@ class NuitkaGUI:
         ##
         ##
         self.f_2 = ttk.Labelframe(self.tab_0, text='调试选项', labelanchor='nw')
-        self.f_2.place(x=620, y=320, width=600,height=280)
+        self.f_2.place(x=620, y=320, width=600,height=200)
         #
         self.py_dbg = tk.IntVar(value=0)
         self.cbtn_0 = ttk.Checkbutton(self.f_2, text='Python Debug', variable=self.py_dbg, offvalue=0, onvalue=1)
@@ -763,9 +763,9 @@ class NuitkaGUI:
         self.cbtn_14.grid(column=0, row=1, sticky='w', columnspan=2)
         #
         self.assume_yes_for_downloads = tk.BooleanVar(value=True)
-        self.cbtn_15 = ttk.Checkbutton(self.tab_5, #variable=self.assume_yes_for_downloads,\
-                                       command=self.disable_or_enable_download,\
-                                       offvalue=False, onvalue=True, text='允许Nuitka在必要时下载外部代码(主要是编译器及其依赖)')
+        self.cbtn_15 = ttk.Checkbutton(self.tab_5, variable=self.assume_yes_for_downloads,
+                                       #command=self.disable_or_enable_download,\
+                                       offvalue=False, onvalue=True, text='允许Nuitka在必要时下载外部代码(主要是编译器及其依赖)(⚠警告:不要轻易禁用)')
         ###self.cbtn_15.bind('<<Toggled>>', lambda event:self.disable_or_enable_download())
         self.cbtn_15.grid(column=0, row=2, sticky='w', columnspan=2)
         #
@@ -922,7 +922,7 @@ class NuitkaGUI:
         self.btn_7 = ttk.Button(self.f_11, text='浏览', command=self.select_xml)
         self.btn_7.grid(column=2, row=0)
         #
-        self.low_memory = tk.IntVar(value=1)
+        self.low_memory = tk.IntVar(value=0)
         self.cbtn_7 = ttk.Checkbutton(self.f_11, variable=self.low_memory, offvalue=0,\
                                       onvalue=1, text='降低内存用量')
         self.cbtn_7.grid(column=0, row=2, sticky='w')
@@ -952,12 +952,13 @@ class NuitkaGUI:
         self.f_13 = ttk.Labelframe(self.tab_11, text='加速与优化', labelanchor='nw')
         self.f_13.place(x=20, y=300, width=1220, height=260)
         #
-        self.lb_8 = ttk.Label(self.f_13, text='并行编译作业数(先点击一下按钮才能调节)')
+        self.lb_8 = ttk.Label(self.f_13, text='并行编译作业数')
         self.lb_8.grid(column=0, row=0, sticky='w')
         #self.jobs_values = ...
-        self.jobs = tk.StringVar()
-        self.sbox_0 = ttk.Spinbox(self.f_13, from_=1-os.cpu_count(), to=os.cpu_count(), textvariable=self.jobs) # type: ignore
-        self.sbox_0.grid(column=1, row=0)
+        self.jobs = tk.StringVar(value='auto')
+        self.cbox_5 = ttk.Combobox(self.f_13, values=['auto', '1', '2', '4', '8', '16'])
+        self.cbox_5.bind('<<ComboboxSelected>>', lambda e: self.jobs.set(self.cbox_5.get()))
+        self.cbox_5.grid(column=1, row=0)
         #
         self.lb_9 = ttk.Label(self.f_13, text='链接时优化(可进一步防反汇编)')
         self.lb_9.grid(column=0, row=2, sticky='w')
@@ -1270,6 +1271,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
                                                  foreground='#f9f9f9',
                                                  font=tkinter.font.Font(family='Consolas',size=14))
         self.console.pack(fill='both',expand=True)
+        self.console.tag_configure('error', foreground="#f14747")
 
     '''
     def test_tab(self):
@@ -1294,8 +1296,9 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         self.btn_31.grid(column=1, row=0, padx=10, pady=10)
         #
         self.status_var = tk.StringVar(value='')
-        self.stat_bar = ttk.Label(self.right, textvariable=self.status_var)
-        self.stat_bar.grid(column=0, row=1, padx=5, pady=5)
+        self.stat_bar = tk.Label(self.right, textvariable=self.status_var,\
+                                 borderwidth=3, relief='ridge', font=self.font_0)
+        self.stat_bar.grid(column=0, row=1, padx=5, pady=5, columnspan=2, sticky='nsew')
         #
     
     def get_system_info(self):   #Just on Linux
@@ -1318,6 +1321,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         return f'{username}@{hostname} ~$ '
     
     def run_command(self, command:list|str):
+        self.status_var.set('开始编译')
         self.console.config(state='normal')
         self.console.insert(tk.END, f'操作系统: {platform.platform()}\n')
         self.console.see(tk.END)
@@ -1334,21 +1338,31 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
                                             bufsize=1,\
                                                 universal_newlines=True)
         while True:
-            output = proc.stdout.readline()  # type: ignore
-            if output=='' and proc.poll() is not None:
+            stdout_output = proc.stdout.readline()  # type: ignore
+            stderr_output = proc.stderr.readline()  # type: ignore
+            if stdout_output == '' and stderr_output == '' and proc.poll() is not None:
                 break
-            if output:
+            if stdout_output:
                 self.console.config(state='normal')
-                self.console.insert(tk.END, output)
+                self.console.insert(tk.END, stdout_output)
                 self.console.see(tk.END)
                 self.console.config(state='disabled')
                 self.root.update_idletasks()
-            time.sleep(0.1)
+            if stderr_output:
+                self.console.config(state='normal')
+                self.console.insert(tk.END, stderr_output, 'error')
+                self.console.see(tk.END)
+                self.console.config(state='disabled')
+                self.root.update_idletasks()
+            time.sleep(0.01)
         ret_code = proc.poll()
         self.console.config(state='normal')
         self.console.insert(tk.END, '\n' + head + '\n')
         self.console.config(state='disabled')
-        return ret_code
+        if not ret_code:
+            self.status_var.set('编译成功! 子进程返回码: 0')
+        else:
+            self.status_var.set(f'编译失败! 子进程返回码: {ret_code}')
     
     def select_script(self): #Select Python script
         s = filedialog.askopenfilename(filetypes=[('Python脚本','*.py;*.pyw')])
@@ -1400,6 +1414,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         f = filedialog.askdirectory()
         self.output_dir.set(f)
     
+    '''
     def disable_or_enable_download(self):
         if self.assume_yes_for_downloads.get():
             r = messagebox.askyesno(title='确认', message='禁止Nuitka在必要时下载外部代码(主要是编译器及其依赖)吗?')
@@ -1407,6 +1422,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
                 self.assume_yes_for_downloads.set(False)
         else:
             self.assume_yes_for_downloads.set(True)
+    '''
 
     def select_yaml_file(self):
         f = filedialog.askopenfilename(filetypes=[('YAML文件', '*.yml;*.yaml')])
@@ -1543,7 +1559,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
 
         ##
         #导入控制
-        if not self.no_follow_imports:
+        if not self.no_follow_imports.get():
             if self.follow_imports.get():
                 cmd.append('--follow-imports')
             
@@ -1564,13 +1580,13 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
 
         ##
         #单文件选项
-        if self.onefile_as_archive:
+        if self.onefile_as_archive.get():
             cmd.append('--onefile-as-archive')
 
-        if self.onefile_no_compression:
+        if self.onefile_no_compression.get():
             cmd.append('--onefile-no-compression')
         
-        if self.onefile_no_dll:
+        if self.onefile_no_dll.get():
             cmd.append('--onefile-no-dll')
         
         if self.onefile_child_grace.get() != 5000:
@@ -1707,7 +1723,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             case 'clang':
                 cmd.append('--clang')
         
-        if self.jobs.get() != '0':
+        if self.jobs.get() != 'auto':
             cmd.append(f'--jobs={self.jobs.get()}')
         
         if self.lto.get() != 'auto':
@@ -1761,7 +1777,9 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             return cmd
     
     def run_compile(self):
-        ...
+        cmd = self.get_command(True)
+        t = threading.Thread(target=self.run_command, args=(cmd,))
+        t.start()
 
 
 
