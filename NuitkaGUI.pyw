@@ -1287,7 +1287,16 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         self.right = ttk.Frame(self.stat)
         self.right.place(x=800, y=0, width=460, height=100)
         #
-        ...
+        self.btn_30 = ttk.Button(self.right, text='开始编译', command=self.run_compile)
+        self.btn_30.grid(column=0, row=0, padx=10, pady=10)
+        #
+        self.btn_31 = ttk.Button(self.right, text='生成构建命令', command=lambda: self.get_command(False))
+        self.btn_31.grid(column=1, row=0, padx=10, pady=10)
+        #
+        self.status_var = tk.StringVar(value='')
+        self.stat_bar = ttk.Label(self.right, textvariable=self.status_var)
+        self.stat_bar.grid(column=0, row=1, padx=5, pady=5)
+        #
     
     def get_system_info(self):   #Just on Linux
         try:
@@ -1452,7 +1461,12 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             fn = f.replace('\\', '/')
             var.set(fn)
 
-    def get_command(self):
+    def get_command(self, return_command=True):
+        try:
+            self.command.delete(0.0, tk.END)
+        except:
+            pass
+        
         if not self.interpreter.get():
             messagebox.showerror(title='错误', message='你没有选择Python解释器!')
             return
@@ -1733,7 +1747,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         #插件选项
         for p in self.plugins:
             plugin = p.replace('-', '_')
-            if getattr(self, plugin):
+            if getattr(self, plugin).get():
                 cmd.append(f'--enable-plugins={p}')
         
         if self.user_plugin.get():
@@ -1741,6 +1755,13 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         
         ##################大功告成!!!#########################
         ##################最后, 只剩一点!!!###################
+        self.command.insert(tk.END, ' '.join(cmd))
+        self.command.see(tk.END)
+        if return_command:
+            return cmd
+    
+    def run_compile(self):
+        ...
 
 
 
