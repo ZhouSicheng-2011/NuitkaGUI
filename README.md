@@ -18,4 +18,4 @@ Nuitka的GUI打包工具
 **C编译器:** 如果在Windows上， **MSVC编译器** 需要[自行安装](https://visualstudio.microsoft.com/zh-hans/)，MinGW64可以[自行下载](https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.1-12.0.0-msvcrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64msvcrt-12.0.0-r2.zip)并配置，也可以由本程序安装包处理；如果在Linux上，系统应该已经有GCC编译器，基本无需处理
 
 ## 下载本工具
-**目前本工具正在开发，请稍等~**
+**前往[Release页面](https://github.com/ZhouSicheng-2011/NuitkaGUI/releases/tag/v1.0.0)下载**
