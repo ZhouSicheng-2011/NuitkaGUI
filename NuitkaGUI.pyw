@@ -9,9 +9,11 @@ import tkinter.font
 #子进程处理相关模块
 import subprocess
 import sys
+#import select
 
 #多线程处理相关模块
 import threading
+import queue
 
 #相关模块
 import os
@@ -292,12 +294,12 @@ class NuitkaGUI:
         self.f_3 = ttk.Labelframe(self.tab_2, text='包含包', labelanchor='nw')
         self.f_3.place(x=20, y=20, width=600, height=540)
         #
-        self.follow_imports = tk.IntVar(value=1)
-        self.cbtn_1 = ttk.Checkbutton(self.f_3, text='递归处理导入模块(推荐)', offvalue=0, onvalue=1)
+        self.follow_imports = tk.BooleanVar(value=False)
+        self.cbtn_1 = ttk.Checkbutton(self.f_3, text='递归处理导入模块(推荐)', offvalue=False, onvalue=True)
         self.cbtn_1.grid(column=0, columnspan=2, row=0, sticky='w')
         #
-        self.follow_stdlib = tk.IntVar(value=1)
-        self.cbtn_2 = ttk.Checkbutton(self.f_3, text='递归处理标准库导入(推荐)', offvalue=0, onvalue=1)
+        self.follow_stdlib = tk.BooleanVar(value=False)
+        self.cbtn_2 = ttk.Checkbutton(self.f_3, text='递归处理标准库导入(推荐)', offvalue=False, onvalue=True)
         self.cbtn_2.grid(column=0, columnspan=2, row=1, sticky='w')
         ##
         self.lb_3 = ttk.Label(self.f_3, text='递归处理导入库:')
@@ -1320,49 +1322,106 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         
         return f'{username}@{hostname} ~$ '
     
-    def run_command(self, command:list|str):
-        self.status_var.set('开始编译')
+    
+    # 在类中添加以下方法（替换原有相关方法）
+    def run_command(self, command: list | str):
+        self.status_var.set('开始编译...')
+        # 禁用按钮防止重复点击
+        self.btn_30.config(state='disabled')
+        self.btn_31.config(state='disabled')
+        
         self.console.config(state='normal')
+        self.console.delete(1.0, tk.END)  # 清空控制台
         self.console.insert(tk.END, f'操作系统: {platform.platform()}\n')
-        self.console.see(tk.END)
-        head = r'C:\Windows\System32 > ' if platform.system()=='Windows' \
-        else self.get_system_info()
-        cmd = ' '.join(command) if isinstance(command,list) else command
-        self.console.insert(tk.END, head+cmd+'\n')
+        head = r'C:\Windows\System32 > ' if platform.system() == 'Windows' else self.get_system_info()
+        cmd_str = ' '.join(command) if isinstance(command, list) else command
+        self.console.insert(tk.END, head + cmd_str + '\n')
         self.console.see(tk.END)
         self.console.config(state='disabled')
-        proc = subprocess.Popen(command,\
-                                stdout=subprocess.PIPE,\
-                                    stderr=subprocess.PIPE,\
-                                        text=True,\
-                                            bufsize=1,\
-                                                universal_newlines=True)
-        while True:
-            stdout_output = proc.stdout.readline()  # type: ignore
-            stderr_output = proc.stderr.readline()  # type: ignore
-            if stdout_output == '' and stderr_output == '' and proc.poll() is not None:
-                break
-            if stdout_output:
-                self.console.config(state='normal')
-                self.console.insert(tk.END, stdout_output)
-                self.console.see(tk.END)
-                self.console.config(state='disabled')
-                self.root.update_idletasks()
-            if stderr_output:
-                self.console.config(state='normal')
-                self.console.insert(tk.END, stderr_output, 'error')
-                self.console.see(tk.END)
-                self.console.config(state='disabled')
-                self.root.update_idletasks()
-            time.sleep(0.01)
-        ret_code = proc.poll()
+        
+        try:
+            # 创建进程（关键修改：使用行缓冲）
+            self.proc = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,  # 行缓冲模式
+                universal_newlines=True,
+                encoding='utf-8',
+                errors='replace'
+            )
+            
+            # 启动输出处理线程
+            threading.Thread(target=self._read_output_stream, 
+                            args=(self.proc.stdout, False), daemon=True).start()
+            threading.Thread(target=self._read_output_stream, 
+                            args=(self.proc.stderr, True), daemon=True).start()
+            
+        except Exception as e:
+            self.console.config(state='normal')
+            self.console.insert(tk.END, f"启动进程失败: {str(e)}\n", 'error')
+            self.console.see(tk.END)
+            self.console.config(state='disabled')
+            self.status_var.set('启动进程失败')
+            # 重新启用按钮
+            self.btn_30.config(state='normal')
+            self.btn_31.config(state='normal')
+
+    def _read_output_stream(self, stream, is_error):
+        """在后台线程中读取输出流"""
+        try:
+            while True:
+                line = stream.readline()
+                if not line:  # 流结束
+                    break
+                
+                # 使用线程安全方式更新UI
+                self.root.after(0, self._update_console, line, is_error)
+                
+        except Exception as e:
+            error_msg = f"读取输出错误: {str(e)}\n"
+            self.root.after(0, self._update_console, error_msg, True)
+        finally:
+            stream.close()
+            # 检查进程是否结束
+            if self.proc.poll() is not None:
+                self.root.after(100, self._finalize_process)
+
+    def _update_console(self, line, is_error):
+        """在主线程中更新控制台显示"""
         self.console.config(state='normal')
-        self.console.insert(tk.END, '\n' + head + '\n')
-        self.console.config(state='disabled')
-        if not ret_code:
-            self.status_var.set('编译成功! 子进程返回码: 0')
+        if is_error:
+            self.console.insert(tk.END, line, 'error')
         else:
-            self.status_var.set(f'编译失败! 子进程返回码: {ret_code}')
+            self.console.insert(tk.END, line)
+        
+        # 自动滚动到底部
+        self.console.see(tk.END)
+        self.console.config(state='disabled')
+        
+        # 确保UI更新
+        self.root.update_idletasks()
+
+    def _finalize_process(self):
+        """处理进程结束"""
+        ret_code = self.proc.poll()
+        
+        self.console.config(state='normal')
+        head = r'C:\Windows\System32 > ' if platform.system() == 'Windows' else self.get_system_info()
+        status_msg = f"\n{head}进程结束，返回码: {ret_code}\n\n"
+        self.console.insert(tk.END, status_msg)
+        self.console.see(tk.END)
+        self.console.config(state='disabled')
+        
+        if ret_code == 0:
+            self.status_var.set('编译成功!')
+        else:
+            self.status_var.set(f'编译失败! 返回码: {ret_code}')
+        
+        # 重新启用按钮
+        self.btn_30.config(state='normal')
+        self.btn_31.config(state='normal')
     
     def select_script(self): #Select Python script
         s = filedialog.askopenfilename(filetypes=[('Python脚本','*.py;*.pyw')])
@@ -1498,6 +1557,10 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         cmd.append('nuitka')
         cmd.append(f'--main={self.script.get()}')
         cmd.append(f'--mode={self.mode.get()}')
+        cmd.append('--verbose')
+        cmd.append('--show-memory')
+        cmd.append('--show-scons')
+        cmd.append('--show-modules')
 
         if self.py_dbg.get():
             cmd.append('--python-debug')
@@ -1780,6 +1843,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         cmd = self.get_command(True)
         t = threading.Thread(target=self.run_command, args=(cmd,))
         t.start()
+
 
 
 
