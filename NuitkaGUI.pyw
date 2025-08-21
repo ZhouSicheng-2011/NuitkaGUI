@@ -75,6 +75,9 @@ class NuitkaGUI:
         self.console_tab()
 
         #...
+        self.proc = None
+        self.proc_end = False
+        self.output_queue = queue.Queue()
 
         self.console.config(state='disabled')
         self.stat = ttk.Frame(self.root)
@@ -294,12 +297,12 @@ class NuitkaGUI:
         self.f_3 = ttk.Labelframe(self.tab_2, text='包含包', labelanchor='nw')
         self.f_3.place(x=20, y=20, width=600, height=540)
         #
-        self.follow_imports = tk.BooleanVar(value=False)
-        self.cbtn_1 = ttk.Checkbutton(self.f_3, text='递归处理导入模块(推荐)', offvalue=False, onvalue=True)
+        self.follow_imports = tk.IntVar(value=1)
+        self.cbtn_1 = ttk.Checkbutton(self.f_3, text='递归处理导入模块(推荐)', offvalue=0, onvalue=1)
         self.cbtn_1.grid(column=0, columnspan=2, row=0, sticky='w')
         #
-        self.follow_stdlib = tk.BooleanVar(value=False)
-        self.cbtn_2 = ttk.Checkbutton(self.f_3, text='递归处理标准库导入(推荐)', offvalue=False, onvalue=True)
+        self.follow_stdlib = tk.IntVar(value=1)
+        self.cbtn_2 = ttk.Checkbutton(self.f_3, text='递归处理标准库导入(推荐)', offvalue=0, onvalue=1)
         self.cbtn_2.grid(column=0, columnspan=2, row=1, sticky='w')
         ##
         self.lb_3 = ttk.Label(self.f_3, text='递归处理导入库:')
@@ -1322,106 +1325,46 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         
         return f'{username}@{hostname} ~$ '
     
-    
-    # 在类中添加以下方法（替换原有相关方法）
-    def run_command(self, command: list | str):
+    def run_command(self, command:list|str):
         self.status_var.set('开始编译...')
-        # 禁用按钮防止重复点击
-        self.btn_30.config(state='disabled')
-        self.btn_31.config(state='disabled')
-        
         self.console.config(state='normal')
-        self.console.delete(1.0, tk.END)  # 清空控制台
-        self.console.insert(tk.END, f'操作系统: {platform.platform()}\n')
-        head = r'C:\Windows\System32 > ' if platform.system() == 'Windows' else self.get_system_info()
-        cmd_str = ' '.join(command) if isinstance(command, list) else command
-        self.console.insert(tk.END, head + cmd_str + '\n')
+        self.console.insert(tk.END, f'操作系统: {platform.platform()}\n\n')
+        self.console.see(tk.END)
+        head = r'C:\Windows\System32 > ' if platform.system()=='Windows' \
+        else self.get_system_info()
+        cmd = ' '.join(command) if isinstance(command,list) else command
+        self.console.insert(tk.END, head+cmd+'\n')
         self.console.see(tk.END)
         self.console.config(state='disabled')
-        
-        try:
-            # 创建进程（关键修改：使用行缓冲）
-            self.proc = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                bufsize=1,  # 行缓冲模式
-                universal_newlines=True,
-                encoding='utf-8',
-                errors='replace'
-            )
-            
-            # 启动输出处理线程
-            threading.Thread(target=self._read_output_stream, 
-                            args=(self.proc.stdout, False), daemon=True).start()
-            threading.Thread(target=self._read_output_stream, 
-                            args=(self.proc.stderr, True), daemon=True).start()
-            
-        except Exception as e:
-            self.console.config(state='normal')
-            self.console.insert(tk.END, f"启动进程失败: {str(e)}\n", 'error')
-            self.console.see(tk.END)
-            self.console.config(state='disabled')
-            self.status_var.set('启动进程失败')
-            # 重新启用按钮
-            self.btn_30.config(state='normal')
-            self.btn_31.config(state='normal')
+        self.proc = subprocess.Popen(command,\
+                                stdout=subprocess.PIPE,\
+                                    stderr=subprocess.PIPE,\
+                                        text=True,\
+                                            bufsize=1,\
+                                                universal_newlines=True)
+        thread_0 = threading.Thread(target=self.read_stream_stderr)
+        thread_0.start()
 
-    def _read_output_stream(self, stream, is_error):
-        """在后台线程中读取输出流"""
-        try:
-            while True:
-                line = stream.readline()
-                if not line:  # 流结束
-                    break
-                
-                # 使用线程安全方式更新UI
-                self.root.after(0, self._update_console, line, is_error)
-                
-        except Exception as e:
-            error_msg = f"读取输出错误: {str(e)}\n"
-            self.root.after(0, self._update_console, error_msg, True)
-        finally:
-            stream.close()
-            # 检查进程是否结束
-            if self.proc.poll() is not None:
-                self.root.after(100, self._finalize_process)
-
-    def _update_console(self, line, is_error):
-        """在主线程中更新控制台显示"""
-        self.console.config(state='normal')
-        if is_error:
-            self.console.insert(tk.END, line, 'error')
-        else:
-            self.console.insert(tk.END, line)
-        
-        # 自动滚动到底部
-        self.console.see(tk.END)
-        self.console.config(state='disabled')
-        
-        # 确保UI更新
-        self.root.update_idletasks()
-
-    def _finalize_process(self):
-        """处理进程结束"""
-        ret_code = self.proc.poll()
-        
-        self.console.config(state='normal')
-        head = r'C:\Windows\System32 > ' if platform.system() == 'Windows' else self.get_system_info()
-        status_msg = f"\n{head}进程结束，返回码: {ret_code}\n\n"
-        self.console.insert(tk.END, status_msg)
-        self.console.see(tk.END)
-        self.console.config(state='disabled')
-        
-        if ret_code == 0:
-            self.status_var.set('编译成功!')
-        else:
-            self.status_var.set(f'编译失败! 返回码: {ret_code}')
-        
-        # 重新启用按钮
-        self.btn_30.config(state='normal')
-        self.btn_31.config(state='normal')
+        thread_1 = threading.Thread(target=self.read_stream_stdout)
+        thread_1.start()
+        while True:
+            try:
+                self.console.config(state='normal')
+                line = self.output_queue.get_nowait()
+                self.console.insert(tk.END, line)
+                self.console.see(tk.END)
+                self.root.update_idletasks()
+                self.console.config(state='disabled')
+            except queue.Empty:
+                if self.proc_end == True:
+                    if self.proc.poll():
+                        self.status_var.set(f'编译失败,返回码:{self.proc.poll}')
+                        return
+                    else:
+                        self.status_var.set('编译成功,返回码:0')
+                        return
+                else:
+                    continue
     
     def select_script(self): #Select Python script
         s = filedialog.askopenfilename(filetypes=[('Python脚本','*.py;*.pyw')])
@@ -1429,7 +1372,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
 
     def select_interpreter(self):
         i = filedialog.askopenfilename(filetypes=[('Python解释器','*.exe')])
-        pat = r'python(\d{1}\.\d{2}t)?.exe'
+        pat = r'python(\d{1}\.\d{2})?.exe' if platform.system=='Windows' else r'python(\d{1}.\d{1,2})?'
         if re.findall(pat, i):
             self.interpreter.set(i)
             return
@@ -1559,8 +1502,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         cmd.append(f'--mode={self.mode.get()}')
         cmd.append('--verbose')
         cmd.append('--show-memory')
-        cmd.append('--show-scons')
-        cmd.append('--show-modules')
+        #cmd.append('--show-modules')
 
         if self.py_dbg.get():
             cmd.append('--python-debug')
@@ -1653,7 +1595,7 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
             cmd.append('--onefile-no-dll')
         
         if self.onefile_child_grace.get() != 5000:
-            cmd.append(f'--onefile-child-grace={self.onefile_child_grace}')
+            cmd.append(f'--onefile-child-grace={self.onefile_child_grace.get()}')
         
         if self.onefile_cache_mode.get() != 'auto':
             cmd.append(f'--onefile-cache-mode={self.onefile_cache_mode.get()}')
@@ -1843,6 +1785,39 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         cmd = self.get_command(True)
         t = threading.Thread(target=self.run_command, args=(cmd,))
         t.start()
+    
+    def read_stream_stdout(self):
+        if self.proc is not None:
+            while True:
+                stdout = self.proc.stdout.readline() #type: ignore
+                if not stdout and self.proc.poll() is not None: # type: ignore
+                    self.proc_end = True
+                    break
+                elif stdout:
+                    self.output_queue.put_nowait(stdout)
+                    time.sleep(0.01)
+                else:
+                    time.sleep(0.01)
+                    continue
+        else:
+            messagebox.showerror(title='错误', message='异常调用!')
+            return
+    
+    def read_stream_stderr(self):
+        if self.proc is not None:
+            while True:
+                stderr = self.proc.stderr.readline() # type: ignore
+                if not stderr and self.proc.poll() is not None:
+                    self.proc_end = True
+                    break
+                elif stderr:
+                    self.output_queue.put_nowait(stderr)
+                    time.sleep(0.01)
+                else:
+                    time.sleep(0.01)
+                    continue
+        else:
+            messagebox.showerror(title='错误', message='异常调用!')
 
 
 
