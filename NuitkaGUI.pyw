@@ -193,6 +193,10 @@ class NuitkaGUI:
         self.py_dbg = tk.IntVar(value=0)
         self.cbtn_0 = ttk.Checkbutton(self.f_2, text='Python Debug', variable=self.py_dbg, offvalue=0, onvalue=1)
         self.cbtn_0.pack(anchor='w', fill='y')
+        #
+        self.c_pgo = tk.BooleanVar(value=False)
+        self.cbtn_47 = ttk.Checkbutton(self.f_2, text='C层级的PGO优化(独立模式不可用)', variable=self.c_pgo, offvalue=False, onvalue=True)
+        self.cbtn_47.pack(anchor='w', fill='y')
         
 
     def package_tab(self):
@@ -972,6 +976,24 @@ class NuitkaGUI:
         self.cbox_1 = ttk.Combobox(self.f_13, values=['yes','no','auto'], state='readonly', width=19)
         self.cbox_1.bind('<<ComboboxSelected>>', lambda event:self.lto.set(self.cbox_1.get()))
         self.cbox_1.grid(column=1, row=2)
+        ##
+        self.static_libpython = tk.StringVar(value='auto')
+        #
+        self.lb_31 = ttk.Label(self.f_13, text='静态链接Python库')
+        self.lb_31.grid(column=0, row=3)
+        #
+        self.cbox_6 = ttk.Combobox(self.f_13, values=['auto', 'yes', 'no'], state='readonly', width=19)
+        self.cbox_6.bind('<<ComboboxSelected>>', lambda e:self.static_libpython.set(self.cbox_6.get()))
+        self.cbox_6.grid(column=1, row=3)
+        ##
+        self.cf_protection = tk.StringVar(value='auto')
+        #
+        self.lb_32 = ttk.Label(self.f_13, text='GCC的cf-protection模式(如auto, none)')
+        self.lb_32.grid(column=0, row=4)
+        #
+        self.cbox_7 = ttk.Combobox(self.f_13, values=['auto', 'none'], width=19)
+        self.cbox_7.bind('<<ComboboxSelected>>', lambda e:self.cf_protection.set(self.cbox_7.get()))
+        self.cbox_7.grid(column=1, row=4)
 
     def OS_tab(self):
         self.tab_12 = ttk.Frame(self.notebook)
@@ -985,18 +1007,33 @@ class NuitkaGUI:
                                       onvalue=1, text='向Windows用户账户控制请求管理员权限')
         self.cbtn_8.place(x=20, y=20 ,width=500, height=40)
         #
+        self.windows_uac_uiaccess = tk.IntVar(value=0)
+        self.cbtn_17 = ttk.Checkbutton(self.f_14, variable=self.windows_uac_uiaccess, offvalue=0,\
+                                        onvalue=1, text='请求Windoows用户账户控制UI访问权限')
+        self.cbtn_17.place(x=20, y=60 ,width=500, height=40)
+        #
         self.f_15 = ttk.Labelframe(self.f_14, text='控制台模式', labelanchor='nw')
-        self.f_15.place(x=20, y=80, width=540, height=260)
+        self.f_15.place(x=20, y=100, width=540, height=240)
         self.windows_console_mode = tk.StringVar(value='force')
         self.wincm = {'force':'执行时跳出控制台',
                       'disable':'禁用控制台',
                       'attach':'从命令行启动时控制台附加到原控制台, 双击启动无控制台',
                       'hide':'控制台会被创建, 但会被最小化, 中途可能突然跳出'}
-        self.ctrl_group_3 = dict()
-        for k in self.wincm.keys():
-            self.ctrl_group_3[k] = ttk.Radiobutton(self.f_15, value=k, text=self.wincm[k],\
-                                                   variable=self.windows_console_mode)
-            self.ctrl_group_3[k].pack(anchor='w', fill='y')
+        self.rbtn_13 = ttk.Radiobutton(self.f_15, variable=self.windows_console_mode, value='force',\
+                                       text=self.wincm['force'])
+        self.rbtn_13.pack(anchor='w', fill='y')
+        #
+        self.rbtn_14 = ttk.Radiobutton(self.f_15, variable=self.windows_console_mode, value='disable',\
+                                       text=self.wincm['disable'])
+        self.rbtn_14.pack(anchor='w', fill='y')
+        #
+        self.rbtn_15 = ttk.Radiobutton(self.f_15, variable=self.windows_console_mode, value='attach',\
+                                       text=self.wincm['attach'])
+        self.rbtn_15.pack(anchor='w', fill='y')
+        #
+        self.rbtn_16 = ttk.Radiobutton(self.f_15, variable=self.windows_console_mode, value='hide',\
+                                       text=self.wincm['hide'])
+        self.rbtn_16.pack(anchor='w', fill='y')
 
         ##
         ##
@@ -1070,6 +1107,10 @@ class NuitkaGUI:
         self.copyright_text_var = tk.StringVar()
         ttk.Label(self.tab_13, text='版本信息中版权信息').grid(column=0, row=4, padx=10, pady=10)
         ttk.Entry(self.tab_13, textvariable=self.copyright_text_var, width=100).grid(column=1, row=4, padx=10, pady=10)
+
+        self.trademarks_var = tk.StringVar(value='')
+        ttk.Label(self.tab_13, text='版本信息中商标').grid(column=0, row=5, padx=10, pady=10)
+        ttk.Entry(self.tab_13, textvariable=self.trademarks_var, width=100).grid(column=1, row=5, padx=10, pady=10)
 
     def plugin_tab(self):
         self.plugins = [
@@ -1536,6 +1577,12 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         
         if self.var_unbuffered.get():
             cmd.append('--python-flag=unbuffered')
+        
+        if self.py_dbg.get():
+            cmd.append('--python-debug')
+        
+        if self.c_pgo.get():
+            cmd.append('--c-pgo')
 
         ##
         #包控制
@@ -1734,12 +1781,21 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         if self.lto.get() != 'auto':
             cmd.append(f'--lto={self.lto.get()}')
         
+        if self.cf_protection.get() != 'auto':
+            cmd.append(f'--cf-protection={self.cf_protection.get()}')
+        
+        if self.static_libpython.get() != 'auto':
+            cmd.append(f'--static-libpython={self.static_libpython.get()}')
+        
         ##
         #系统特定选项
         cmd.append(f'--windows-console-mode={self.windows_console_mode.get()}')
         
         if self.windows_uac_admin.get():
             cmd.append('--windows-uac-admin')
+
+        if self.windows_uac_uiaccess.get():
+            cmd.append('--windows-uac-uiaccess')
         
         if self.windows_icon_from_ico:
             for i in self.windows_icon_from_ico:
@@ -1763,6 +1819,9 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         
         if self.copyright_text_var.get():
             cmd.append(f'--copyright-text={self.copyright_text_var.get()}')
+        
+        if self.trademarks_var.get():
+            cmd.append(f'--trademarks={self.trademarks_var.get()}')
         
         ##
         #插件选项
