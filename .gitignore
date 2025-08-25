@@ -209,3 +209,6 @@ __marimo__/
 #Ignore the files which Nuitka complied
 *.build/
 *.dist/
+
+#Ignore the compiled and compressed files
+*.7z
