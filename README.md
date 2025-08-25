@@ -11,11 +11,11 @@ Nuitka的GUI打包工具
 **网络:** 需要流畅的Internet连接
 
 ### 操作系统
-目前仅支持 **Windows 10 及以上** 和 **Linux** 
+目前仅支持 **Windows 10 及以上** 和 **Linux桌面操作系统** 
 ### 必要程序
 **Python解释器:** Python **3.4-3.13** ，在自由线程解释器成熟前不建议使用自由线程解释器，下载链接：[Python官方网站下载页面](https://www.python.org/downloads/)
 
-**C编译器:** 如果在Windows上， **MSVC编译器** 需要[自行安装](https://visualstudio.microsoft.com/zh-hans/)，MinGW64可以[自行下载](https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.1-12.0.0-msvcrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64msvcrt-12.0.0-r2.zip)并配置，也可以由本程序安装包处理；如果在Linux上，系统应该已经有GCC编译器，基本无需处理
+**C编译器:** 如果在Windows上， **MSVC编译器** 需要[自行安装](https://visualstudio.microsoft.com/zh-hans/)，MinGW64可以[自行下载](https://github.com/brechtsanders/winlibs_mingw/releases/)并配置，也可以由本程序安装包处理；如果在Linux上，系统应该已经有GCC编译器，基本无需处理
 
 ## 下载本工具
-**前往[Release页面](https://github.com/ZhouSicheng-2011/NuitkaGUI/releases/tag/v1.0.0)下载**
+**前往[Release页面](https://github.com/ZhouSicheng-2011/NuitkaGUI/releases)下载**
