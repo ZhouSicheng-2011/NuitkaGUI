@@ -38,6 +38,25 @@ def extract_mingw64(progress_bar:ttk.Progressbar, total:int | float, to:str, var
 
 def get_app(progress_bar:ttk.Progressbar, total:int | float):
     app = files('') / 'assets/NuitkaGUI.7z'
+    BLOCK_SIZE = 1024 ** 2
+    FILE_SIZE = 6978352
+    done = 0
+    with app.open('rb') as fp, open(r'C:\install_cache\app.7z', 'wb') as fn:
+        while True:
+            data = fp.read(BLOCK_SIZE)
+            if not data:
+                break
+            fn.write(data)
+            done += len(data)
+            progress_bar.step((done / FILE_SIZE) * total)
 
-def extract_app(progress_bar:ttk.Progressbar, total:int | float, to:str):
-    ...
+def extract_app(progress_bar:ttk.Progressbar, total:int | float, install_dir:str):
+    with py7zr.SevenZipFile(r'C:\install_cache\app.7z', 'r') as fp:
+        file_list = fp.namelist()
+        TOTAL_FILES = len(file_list)
+        done = 0
+        for f in fp.files:
+            fp.extract(targets=[f.filename], path=install_dir)
+            done += 1
+            progress_bar.step(done / TOTAL_FILES * total)
+
