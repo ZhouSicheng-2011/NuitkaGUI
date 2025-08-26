@@ -10,6 +10,7 @@ import py7zr
 from win32com.client import Dispatch
 import sys
 import time
+import threading
 
 def get_mingw64(progress_bar:ttk.Progressbar, total:int | float):
     mingw64 = files('assets') / 'mingw64.7z'
@@ -135,7 +136,7 @@ class Installer:
         self.btn_0 = ttk.Button(self.install_config_area, text='浏览', command=self.browse_install_path)
         self.btn_0.grid(column=2, row=3, padx=5, pady=5)
 
-        self.btn_1 = ttk.Button(self.button_area, text='开始安装', command=self.install)
+        self.btn_1 = ttk.Button(self.button_area, text='开始安装', command=lambda:threading.Thread(target=self.install).start())
         self.btn_1.place(x=260, y=20, width=110, height=40)
 
         self.btn_2 = ttk.Button(self.button_area, text='取消安装', command=sys.exit)
