@@ -213,3 +213,4 @@ __marimo__/
 #Ignore the compiled and compressed files
 *.7z
 *.exe
+*.xml
