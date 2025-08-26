@@ -5,7 +5,6 @@ from tkinter import filedialog
 
 import os
 from importlib.resources import files  #Python 3.9+ is required
-from pathlib import Path
 import py7zr
 from win32com.client import Dispatch
 import sys
