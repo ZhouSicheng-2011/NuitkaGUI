@@ -189,17 +189,18 @@ class Installer:
             self.install_status.set('正在创建开始菜单快捷方式...')
             create_shortcut(os.path.join(install_path, 'NuitkaGUI.exe'), os.path.join(self.startmenu_path, 'NuitkaGUI.lnk'),\
                             'NuitkaGUI')
-            time.sleep(0.01)
+            time.sleep(0.5)
         
         self.progress_bar.step(1)
 
         if desktop_link:
             create_shortcut(os.path.join(install_path, 'NuitkaGUI.exe'), os.path.join(self.desktop_path, 'NuitkaGUI.lnk'), description='NuitkaGUI')
-            time.sleep(0.01)
+            time.sleep(0.5)
 
         self.progress_bar.step(1)
 
         if mingw64:
+            shutil.rmtree(self.mingw64_path)
             get_mingw64(self.progress_bar, 13)
             extract_mingw64(self.progress_bar, 60, self.mingw64_path, self.install_status)
         

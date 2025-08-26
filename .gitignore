@@ -216,6 +216,7 @@ __marimo__/
 #Ignore useless xml file
 *.xml
 
-#ignore batch scripts
+#ignore batch scripts and build scripts
 *.bat
 *.cmd
+build.py
