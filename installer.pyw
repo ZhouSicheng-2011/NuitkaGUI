@@ -10,7 +10,7 @@ import py7zr
 from win32com.client import Dispatch
 import sys
 import time
-import threading
+import shutil
 
 def get_mingw64(progress_bar:ttk.Progressbar, total:int | float):
     mingw64 = files('assets') / 'mingw64.7z'
@@ -26,6 +26,7 @@ def get_mingw64(progress_bar:ttk.Progressbar, total:int | float):
             fn.write(data)
             done += len(data)
             progress_bar.step((done / FILE_SIZE) * total)
+            time.sleep(0.01)
 
 def extract_mingw64(progress_bar:ttk.Progressbar, total:int | float, to:str, var_progress:tk.StringVar):
     var_progress.set('解压编译器文件 0 / 0')
@@ -40,6 +41,7 @@ def extract_mingw64(progress_bar:ttk.Progressbar, total:int | float, to:str, var
             done += 1
             progress_bar.step(done / TOTAL_FILES * total)
             var_progress.set(f'解压编译器文件 {done} / {TOTAL_FILES}')
+            time.sleep(0.01)
 
 def get_app(progress_bar:ttk.Progressbar, total:int | float):
     app = files('assets') / 'NuitkaGUI.7z'
@@ -54,6 +56,7 @@ def get_app(progress_bar:ttk.Progressbar, total:int | float):
             fn.write(data)
             done += len(data)
             progress_bar.step((done / FILE_SIZE) * total)
+            time.sleep(0.01)
 
 def extract_app(progress_bar:ttk.Progressbar, total:int | float, install_dir:str, var_progress:tk.StringVar):
     var_progress.set('解压程序文件 0 / 0')
@@ -67,6 +70,7 @@ def extract_app(progress_bar:ttk.Progressbar, total:int | float, install_dir:str
             done += 1
             progress_bar.step(done / TOTAL_FILES * total)
             var_progress.set(f'解压程序文件 {done} / {TOTAL_FILES}')
+            time.sleep(0.01)
 
 def create_shortcut(target_path:str, shortcut_path:str, description='', working_dir='', icon_path=''):
     shell = Dispatch('WScript.Shell')
@@ -136,7 +140,7 @@ class Installer:
         self.btn_0 = ttk.Button(self.install_config_area, text='浏览', command=self.browse_install_path)
         self.btn_0.grid(column=2, row=3, padx=5, pady=5)
 
-        self.btn_1 = ttk.Button(self.button_area, text='开始安装', command=self.run_install)
+        self.btn_1 = ttk.Button(self.button_area, text='开始安装', command=self.install)
         self.btn_1.place(x=260, y=20, width=110, height=40)
 
         self.btn_2 = ttk.Button(self.button_area, text='取消安装', command=sys.exit)
@@ -166,11 +170,15 @@ class Installer:
 
         self.progress_bar = ttk.Progressbar(self.install_area)
         self.progress_bar.grid(column=0, row=1, sticky='ew')
-        if not os.path.exists(r'C:\install_cache'):
-            os.makedirs(r'C:\install_cache')
+        if os.path.exists(r'C:\install_cache'):
+            shutil.rmtree(r'C:\install_cache')
+
+        os.makedirs(r'C:\install_cache')
         
-        if not os.path.exists(install_path):
-            os.makedirs(install_path)
+        if os.path.exists(install_path):
+            shutil.rmtree(install_path)
+
+        os.makedirs(install_path)
 
         self.install_status.set('正在提取应用程序...')
 
@@ -178,13 +186,16 @@ class Installer:
         extract_app(self.progress_bar, 20, install_path, self.install_status)
 
         if startmenu_link:
+            self.install_status.set('正在创建开始菜单快捷方式...')
             create_shortcut(os.path.join(install_path, 'NuitkaGUI.exe'), os.path.join(self.startmenu_path, 'NuitkaGUI.lnk'),\
-                            'Nuitka的GUI编译辅助工具')
+                            'NuitkaGUI')
+            time.sleep(0.01)
         
         self.progress_bar.step(1)
 
         if desktop_link:
-            create_shortcut(os.path.join(install_path, 'NuitkaGUI.exe'), os.path.join(self.desktop_path, 'NuitkaGUI.lnk'))
+            create_shortcut(os.path.join(install_path, 'NuitkaGUI.exe'), os.path.join(self.desktop_path, 'NuitkaGUI.lnk'), description='NuitkaGUI')
+            time.sleep(0.01)
 
         self.progress_bar.step(1)
 
@@ -199,10 +210,6 @@ class Installer:
         time.sleep(5)
         self.root.destroy()
         sys.exit()
-    
-    def run_install(self):
-        t = threading.Thread(target=self.run_install, args=tuple())
-        t.start()
 
 if __name__ == '__main__':
     try:
