@@ -12,7 +12,7 @@ import sys
 import time
 
 def get_mingw64(progress_bar:ttk.Progressbar, total:int | float):
-    mingw64 = files('') / 'assets/mingw64.7z'
+    mingw64 = files('assets') / 'mingw64.7z'
     BLOCK_SIZE = 1024 ** 2
     FILE_SIZE = 167169998
     done = 0
@@ -41,9 +41,9 @@ def extract_mingw64(progress_bar:ttk.Progressbar, total:int | float, to:str, var
             var_progress.set(f'解压编译器文件 {done} / {TOTAL_FILES}')
 
 def get_app(progress_bar:ttk.Progressbar, total:int | float):
-    app = files('') / 'assets/NuitkaGUI.7z'
+    app = files('assets') / 'NuitkaGUI.7z'
     BLOCK_SIZE = 1024 ** 2
-    FILE_SIZE = 6978352
+    FILE_SIZE = 6985023
     done = 0
     with app.open('rb') as fp, open(r'C:\install_cache\app.7z', 'wb') as fn:
         while True:
