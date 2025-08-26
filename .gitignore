@@ -215,3 +215,7 @@ __marimo__/
 *.exe
 #Ignore useless xml file
 *.xml
+
+#ignore batch scripts
+*.bat
+*.cmd
