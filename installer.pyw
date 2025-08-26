@@ -83,6 +83,7 @@ class Installer:
         self.root = tk.Tk()
         self.root.geometry('500x350+200+200')
         self.root.resizable(False, False)
+        self.root.title('安装NuitkaGUI')
         self.theme = 'vista'
 
         self.style = ttk.Style()
@@ -105,22 +106,24 @@ class Installer:
         self.mingw64_path = f'C:\\Users\\{os.getlogin()}\\AppData\\Local\\Nuitka\\Nuitka\\Cache\\downloads\\gcc\\x86_64\\14.2.0posix-19.1.1-12.0.0-msvcrt-r2'
 
         self.inital_ui()
+
+        self.root.mainloop()
     
     def inital_ui(self):
         self.install_mingw64 = tk.BooleanVar(value=True)
         self.cbtn_0 = ttk.Checkbutton(self.install_config_area, variable=self.install_mingw64,\
-                                      offvalue=False, onvalue=True, text='安装MinGW64(GCC version 14.2.0 (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders, r2))')
-        self.cbtn_0.grid(column=0, row=0, columnspan=2)
+                                      offvalue=False, onvalue=True, text='安装MinGW64(GCC version 14.2.0\n (MinGW-W64 x86_64-msvcrt-posix-seh,\n built by Brecht Sanders, r2))')
+        self.cbtn_0.grid(column=0, row=0, columnspan=2, sticky='w')
 
         self.create_desktop_link = tk.BooleanVar(value=False)
         self.cbtn_1 = ttk.Checkbutton(self.install_config_area, variable=self.create_desktop_link,\
                                       offvalue=False, onvalue=True, text='创建桌面快捷方式')
-        self.cbtn_1.grid(column=0, row=1, columnspan=2)
+        self.cbtn_1.grid(column=0, row=1, columnspan=2, sticky='w')
 
         self.cerate_startmenu_link = tk.BooleanVar(value=False)
         self.cbtn_2 = ttk.Checkbutton(self.install_config_area, variable=self.cerate_startmenu_link,\
                                       offvalue=False, onvalue=True, text='创建开始菜单快捷方式')
-        self.cbtn_2.grid(column=0, row=2, columnspan=2)
+        self.cbtn_2.grid(column=0, row=2, columnspan=2, sticky='w')
 
         self.install_path = tk.StringVar(value=r'C:\Program Files\NuitkaGUI')
         self.lb_0 = ttk.Label(self.install_config_area, text='安装目录:')
@@ -197,5 +200,8 @@ class Installer:
         sys.exit()
 
 if __name__ == '__main__':
-    installer = Installer()
+    try:
+        installer = Installer()
+    except Exception as e:
+        messagebox.showerror(title='安装失败', message=str(e))
         
