@@ -113,27 +113,27 @@ class Installer:
         self.install_mingw64 = tk.BooleanVar(value=True)
         self.cbtn_0 = ttk.Checkbutton(self.install_config_area, variable=self.install_mingw64,\
                                       offvalue=False, onvalue=True, text='安装MinGW64(GCC version 14.2.0\n (MinGW-W64 x86_64-msvcrt-posix-seh,\n built by Brecht Sanders, r2))')
-        self.cbtn_0.grid(column=0, row=0, columnspan=2, sticky='w')
+        self.cbtn_0.grid(column=0, row=0, columnspan=2, sticky='w', padx=5, pady=5)
 
         self.create_desktop_link = tk.BooleanVar(value=False)
         self.cbtn_1 = ttk.Checkbutton(self.install_config_area, variable=self.create_desktop_link,\
                                       offvalue=False, onvalue=True, text='创建桌面快捷方式')
-        self.cbtn_1.grid(column=0, row=1, columnspan=2, sticky='w')
+        self.cbtn_1.grid(column=0, row=1, columnspan=2, sticky='w', padx=5, pady=5)
 
         self.cerate_startmenu_link = tk.BooleanVar(value=False)
         self.cbtn_2 = ttk.Checkbutton(self.install_config_area, variable=self.cerate_startmenu_link,\
                                       offvalue=False, onvalue=True, text='创建开始菜单快捷方式')
-        self.cbtn_2.grid(column=0, row=2, columnspan=2, sticky='w')
+        self.cbtn_2.grid(column=0, row=2, columnspan=2, sticky='w', padx=5, pady=5)
 
         self.install_path = tk.StringVar(value=r'C:\Program Files\NuitkaGUI')
         self.lb_0 = ttk.Label(self.install_config_area, text='安装目录:')
-        self.lb_0.grid(column=0, row=3)
+        self.lb_0.grid(column=0, row=3, padx=5, pady=5)
 
-        self.entry = ttk.Entry(self.install_config_area, textvariable=self.install_path, width=40)
-        self.entry.grid(column=1, row=3)
+        self.entry = ttk.Entry(self.install_config_area, textvariable=self.install_path, width=44)
+        self.entry.grid(column=1, row=3, padx=5, pady=5)
 
         self.btn_0 = ttk.Button(self.install_config_area, text='浏览', command=self.browse_install_path)
-        self.btn_0.grid(column=2, row=3)
+        self.btn_0.grid(column=2, row=3, padx=5, pady=5)
 
         self.btn_1 = ttk.Button(self.button_area, text='开始安装', command=self.install)
         self.btn_1.place(x=260, y=20, width=110, height=40)
