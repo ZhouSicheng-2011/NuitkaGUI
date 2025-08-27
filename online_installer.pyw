@@ -16,11 +16,14 @@ import threading
 import queue
 import traceback
 import hashlib
+import requests
+from urllib.parse import urlparse
+import zipfile
 
 class Installer:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.geometry('500x350+200+200')
+        self.root.geometry('500x400+200+200')  # 增加高度以容纳新的UI元素
         self.root.resizable(False, False)
         self.root.title('安装NuitkaGUI')
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -32,11 +35,20 @@ class Installer:
         self.total_progress = 0
         self.current_step = 0
         self.total_steps = 100
+        self.download_canceled = False
         
         # 路径设置
         self.desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
         self.startmenu_path = os.path.join(os.getenv("APPDATA"), "Microsoft", "Windows", "Start Menu", "Programs") # type: ignore
         self.mingw64_path = f'C:\\Users\\{os.getlogin()}\\AppData\\Local\\Nuitka\\Nuitka\\Cache\\downloads\\gcc\\x86_64\\14.2.0posix-19.1.1-12.0.0-msvcrt-r2'
+        
+        # MinGW64下载镜像
+        self.mirrors = [
+            {"name": "GitHub (官方源)", "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.1-12.0.0-msvcrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64msvcrt-12.0.0-r2.zip"},
+            {"name": "国内镜像1 (腾讯云)", "url": "https://mirrors.cloud.tencent.com/winlibs_mingw/14.2.0posix-19.1.1-12.0.0-msvcrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64msvcrt-12.0.0-r2.zip"},
+            {"name": "国内镜像2 (阿里云)", "url": "https://mirrors.aliyun.com/winlibs_mingw/14.2.0posix-19.1.1-12.0.0-msvcrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64msvcrt-12.0.0-r2.zip"},
+            {"name": "国内镜像3 (Cloudflare代理)", "url": "https://gh-proxy.com/https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.1-12.0.0-msvcrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64msvcrt-12.0.0-r2.zip"}
+        ]
         
         # 设置样式
         self.setup_style()
@@ -57,15 +69,16 @@ class Installer:
         self.style.configure("TLabel", background="#f0f0f0", font=('Consolas', 10))
         self.style.configure("TEntry", font=('Consolas', 10))
         self.style.configure("TCheckbutton", background="#f0f0f0", font=('Consolas', 10))
+        self.style.configure("TCombobox", font=('Consolas', 10))
     
     def create_ui(self):
         # 创建配置区域
         self.install_config_area = ttk.Frame(self.root)
-        self.install_config_area.place(x=0, y=0, width=500, height=250)
+        self.install_config_area.place(x=0, y=0, width=500, height=300)
         
         # 创建按钮区域
         self.button_area = ttk.Frame(self.root)
-        self.button_area.place(x=0, y=250, width=500, height=100)
+        self.button_area.place(x=0, y=300, width=500, height=100)
         
         # 初始化UI组件
         self.init_config_ui()
@@ -80,6 +93,21 @@ class Installer:
         )
         self.cbtn_0.grid(column=0, row=0, columnspan=2, sticky='w', padx=5, pady=5)
         
+        # 下载镜像选择
+        self.mirror_var = tk.StringVar()
+        self.mirror_var.set(self.mirrors[0]["name"])
+        self.lb_mirror = ttk.Label(self.install_config_area, text='下载镜像:')
+        self.lb_mirror.grid(column=0, row=1, padx=5, pady=5, sticky='w')
+        
+        self.mirror_combo = ttk.Combobox(
+            self.install_config_area, 
+            textvariable=self.mirror_var,
+            values=[m["name"] for m in self.mirrors],
+            state="readonly",
+            width=40
+        )
+        self.mirror_combo.grid(column=1, row=1, padx=5, pady=5, sticky='w')
+        
         # 桌面快捷方式选项
         self.create_desktop_link = tk.BooleanVar(value=False)
         self.cbtn_1 = ttk.Checkbutton(
@@ -87,7 +115,7 @@ class Installer:
             variable=self.create_desktop_link,
             text='创建桌面快捷方式'
         )
-        self.cbtn_1.grid(column=0, row=1, columnspan=2, sticky='w', padx=5, pady=5)
+        self.cbtn_1.grid(column=0, row=2, columnspan=2, sticky='w', padx=5, pady=5)
         
         # 开始菜单快捷方式选项
         self.cerate_startmenu_link = tk.BooleanVar(value=False)
@@ -96,18 +124,18 @@ class Installer:
             variable=self.cerate_startmenu_link,
             text='创建开始菜单快捷方式'
         )
-        self.cbtn_2.grid(column=0, row=2, columnspan=2, sticky='w', padx=5, pady=5)
+        self.cbtn_2.grid(column=0, row=3, columnspan=2, sticky='w', padx=5, pady=5)
         
         # 安装目录选择
         self.install_path = tk.StringVar(value=r'C:\Program Files\NuitkaGUI')
         self.lb_0 = ttk.Label(self.install_config_area, text='安装目录:')
-        self.lb_0.grid(column=0, row=3, padx=5, pady=5)
+        self.lb_0.grid(column=0, row=4, padx=5, pady=5, sticky='w')
         
         self.entry = ttk.Entry(self.install_config_area, textvariable=self.install_path, width=44)
-        self.entry.grid(column=1, row=3, padx=5, pady=5)
+        self.entry.grid(column=1, row=4, padx=5, pady=5, sticky='w')
         
         self.btn_0 = ttk.Button(self.install_config_area, text='浏览', command=self.browse_install_path)
-        self.btn_0.grid(column=2, row=3, padx=5, pady=5)
+        self.btn_0.grid(column=2, row=4, padx=5, pady=5, sticky='w')
         
         # 开始安装和取消按钮
         self.btn_1 = ttk.Button(self.button_area, text='开始安装', command=self.start_installation)
@@ -124,6 +152,7 @@ class Installer:
     def on_closing(self):
         if self.installing:
             if messagebox.askokcancel("退出", "安装正在进行中，确定要退出吗？"):
+                self.download_canceled = True
                 self.root.destroy()
                 sys.exit()
         else:
@@ -142,7 +171,7 @@ class Installer:
         
         # 创建安装进度区域
         self.install_area = ttk.Frame(self.root)
-        self.install_area.place(x=0, y=0, width=500, height=250)
+        self.install_area.place(x=0, y=0, width=500, height=350)
         
         # 安装状态标签
         self.install_status = tk.StringVar(value='准备安装...')
@@ -158,10 +187,25 @@ class Installer:
         self.lb_percent = ttk.Label(self.install_area, textvariable=self.progress_percent)
         self.lb_percent.grid(column=0, row=2, padx=10, pady=5, sticky='e')
         
+        # 下载速度标签
+        self.download_speed = tk.StringVar(value='')
+        self.lb_speed = ttk.Label(self.install_area, textvariable=self.download_speed)
+        self.lb_speed.grid(column=0, row=3, padx=10, pady=5, sticky='e')
+        
+        # 取消下载按钮（只在下载MinGW64时显示）
+        self.cancel_download_btn = ttk.Button(self.install_area, text='取消下载', command=self.cancel_download)
+        self.cancel_download_btn.grid(column=0, row=4, padx=10, pady=10, sticky='e')
+        self.cancel_download_btn.grid_remove()  # 默认隐藏
+        
         # 启动安装线程
         self.install_thread = threading.Thread(target=self.installation_worker)
         self.install_thread.daemon = True
         self.install_thread.start()
+    
+    def cancel_download(self):
+        self.download_canceled = True
+        self.cancel_download_btn.config(state='disabled')
+        self.send_status("正在取消下载...")
     
     def process_queue(self):
         """处理从工作线程发送到主线程的消息"""
@@ -172,6 +216,12 @@ class Installer:
                     self.update_progress(msg[1])
                 elif msg[0] == 'status':
                     self.install_status.set(msg[1])
+                elif msg[0] == 'speed':
+                    self.download_speed.set(msg[1])
+                elif msg[0] == 'show_cancel':
+                    self.cancel_download_btn.grid()
+                elif msg[0] == 'hide_cancel':
+                    self.cancel_download_btn.grid_remove()
                 elif msg[0] == 'complete':
                     self.installation_complete()
                 elif msg[0] == 'error':
@@ -212,6 +262,18 @@ class Installer:
     def send_status(self, status):
         """发送状态更新到队列"""
         self.queue.put(('status', status))
+    
+    def send_speed(self, speed):
+        """发送下载速度到队列"""
+        self.queue.put(('speed', speed))
+    
+    def send_show_cancel(self):
+        """显示取消下载按钮"""
+        self.queue.put(('show_cancel',))
+    
+    def send_hide_cancel(self):
+        """隐藏取消下载按钮"""
+        self.queue.put(('hide_cancel',))
     
     def send_complete(self):
         """发送安装完成消息到队列"""
@@ -361,16 +423,23 @@ class Installer:
                 raise Exception(f"{archive_name}压缩包为空")
             
             # 尝试打开压缩包验证完整性
-            with py7zr.SevenZipFile(archive_path, 'r') as archive:
-                file_list = archive.namelist()
-                if not file_list:
-                    raise Exception(f"{archive_name}压缩包为空或损坏")
+            if archive_path.endswith('.7z'):
+                with py7zr.SevenZipFile(archive_path, 'r') as archive:
+                    file_list = archive.namelist()
+                    if not file_list:
+                        raise Exception(f"{archive_name}压缩包为空或损坏")
+            elif archive_path.endswith('.zip'):
+                with zipfile.ZipFile(archive_path, 'r') as archive:
+                    if archive.testzip() is not None:
+                        raise Exception(f"{archive_name}压缩包损坏")
             
             self.send_status(f"{archive_name}压缩包验证成功")
             return True
             
         except py7zr.Bad7zFile:
             raise Exception(f"{archive_name}压缩包损坏，请重新下载安装程序")
+        except zipfile.BadZipFile:
+            raise Exception(f"{archive_name}压缩包损坏，请重新下载")
         except Exception as e:
             raise Exception(f"{archive_name}压缩包验证失败: {str(e)}")
     
@@ -381,53 +450,54 @@ class Installer:
         
         while retry_count < max_retries:
             try:
-                with py7zr.SevenZipFile(archive_path, 'r') as archive:
-                    file_list = archive.namelist()
-                    total_files = len(file_list)
-                    extracted = 0
-                    
-                    # 先创建所有目录结构
-                    for file_info in archive.files:
-                        if file_info.is_directory:
-                            dir_path = os.path.join(extract_path, file_info.filename)
-                            os.makedirs(dir_path, exist_ok=True)
-                    
-                    # 然后提取文件
-                    for file_info in archive.files:
-                        if file_info.is_directory:
-                            continue
+                if archive_path.endswith('.7z'):
+                    with py7zr.SevenZipFile(archive_path, 'r') as archive:
+                        file_list = archive.namelist()
+                        total_files = len(file_list)
+                        extracted = 0
+                        
+                        # 先创建所有目录结构
+                        for file_info in archive.files:
+                            if file_info.is_directory:
+                                dir_path = os.path.join(extract_path, file_info.filename)
+                                os.makedirs(dir_path, exist_ok=True)
+                        
+                        # 然后提取文件
+                        for file_info in archive.files:
+                            if file_info.is_directory:
+                                continue
+                                
+                            # 尝试解压文件，如果失败则重试
+                            success = False
+                            file_retries = 0
                             
-                        # 尝试解压文件，如果失败则重试
-                        success = False
-                        file_retries = 0
-                        
-                        while not success and file_retries < 3:
-                            try:
-                                # 确保目标目录存在
-                                target_dir = os.path.dirname(os.path.join(extract_path, file_info.filename))
-                                os.makedirs(target_dir, exist_ok=True)
-                                
-                                # 提取文件
-                                archive.extract(targets=[file_info.filename], path=extract_path)
-                                success = True
-                            except py7zr.exceptions.CrcError as e:
-                                # 如果是CRC错误，尝试跳过这个文件
-                                self.send_status(f"警告: 文件 {file_info.filename} CRC校验失败，跳过此文件")
-                                success = True  # 标记为成功以继续处理其他文件
-                            except Exception as e:
-                                file_retries += 1
-                                self.send_status(f"解压 {file_info.filename} 失败，重试 {file_retries}/3...")
-                                time.sleep(1)  # 等待1秒后重试
-                                
-                                # 如果是最后一次尝试，抛出异常
-                                if file_retries >= 3:
-                                    raise e
-                        
-                        extracted += 1
-                        # 更新进度
-                        progress = start_progress + (extracted / total_files) * progress_portion
-                        self.send_status(f"解压程序文件 {extracted}/{total_files}")
-                        self.send_progress(progress)
+                            while not success and file_retries < 3:
+                                try:
+                                    # 确保目标目录存在
+                                    target_dir = os.path.dirname(os.path.join(extract_path, file_info.filename))
+                                    os.makedirs(target_dir, exist_ok=True)
+                                    
+                                    # 提取文件
+                                    archive.extract(targets=[file_info.filename], path=extract_path)
+                                    success = True
+                                except py7zr.exceptions.CrcError as e:
+                                    # 如果是CRC错误，尝试跳过这个文件
+                                    self.send_status(f"警告: 文件 {file_info.filename} CRC校验失败，跳过此文件")
+                                    success = True  # 标记为成功以继续处理其他文件
+                                except Exception as e:
+                                    file_retries += 1
+                                    self.send_status(f"解压 {file_info.filename} 失败，重试 {file_retries}/3...")
+                                    time.sleep(1)  # 等待1秒后重试
+                                    
+                                    # 如果是最后一次尝试，抛出异常
+                                    if file_retries >= 3:
+                                        raise e
+                            
+                            extracted += 1
+                            # 更新进度
+                            progress = start_progress + (extracted / total_files) * progress_portion
+                            self.send_status(f"解压程序文件 {extracted}/{total_files}")
+                            self.send_progress(progress)
                 
                 # 如果成功解压所有文件，跳出重试循环
                 break
@@ -488,38 +558,153 @@ class Installer:
         self.send_progress(start_progress + total_progress * 0.1)
         
         # 获取MinGW64压缩包
-        mingw_7z_path = r'C:\install_cache\mingw64.7z'
-        self.get_mingw64_archive(mingw_7z_path, total_progress * 0.2, start_progress)
+        mingw_zip_path = r'C:\install_cache\mingw64.zip'
+        
+        # 获取选中的镜像
+        selected_mirror_name = self.mirror_var.get()
+        selected_mirror = next((m for m in self.mirrors if m["name"] == selected_mirror_name), self.mirrors[0])
+        
+        # 下载MinGW64
+        self.download_mingw64(selected_mirror["url"], mingw_zip_path, total_progress * 0.3, start_progress + total_progress * 0.1)
         
         # 验证压缩包完整性
-        self.validate_archive(mingw_7z_path, "MinGW64")
-        current_progress = start_progress + total_progress * 0.35
+        self.validate_archive(mingw_zip_path, "MinGW64")
+        current_progress = start_progress + total_progress * 0.45
         self.send_progress(current_progress)
         
         # 解压MinGW64
-        self.extract_mingw64_archive(mingw_7z_path, self.mingw64_path, total_progress * 0.65, current_progress)
+        self.extract_mingw64_archive(mingw_zip_path, self.mingw64_path, total_progress * 0.55, current_progress)
         self.send_progress(start_progress + total_progress)
     
-    def get_mingw64_archive(self, output_path, progress_portion, start_progress):
-        """获取MinGW64压缩包"""
-        try:
-            mingw_resource = files('assets') / 'mingw64.7z'
-            BLOCK_SIZE = 1024 * 1024  # 1MB
-            FILE_SIZE = 167169998
+    def download_mingw64(self, url:str, output_path, progress_portion, start_progress):
+        """下载MinGW64压缩包，支持断点续传"""
+        self.send_status(f"开始下载MinGW64编译器...")
+        self.send_show_cancel()  # 显示取消下载按钮
+        self.download_canceled = False
+        headers = {
+            # 用户代理 - 模拟真实浏览器
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
             
-            with mingw_resource.open('rb') as source, open(output_path, 'wb') as target:
-                downloaded = 0
-                while True:
-                    data = source.read(BLOCK_SIZE)
-                    if not data:
-                        break
-                    target.write(data)
-                    downloaded += len(data)
-                    # 更新进度
-                    progress = start_progress + (downloaded / FILE_SIZE) * progress_portion
-                    self.send_progress(progress)
+            # 引用来源 - 对抗防盗链
+            "Referer": url.split('//')[0] + '//' + url.split('//')[1].split('/')[0],
+            
+            # 接受内容类型
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            
+            # 接受编码
+            "Accept-Encoding": "gzip, deflate, br",
+            
+            # 接受语言
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            
+            # 连接状态
+            "Connection": "keep-alive",
+            
+            # 缓存控制
+            "Cache-Control": "max-age=0",
+            
+            # 安全相关头部
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "same-origin",
+            "Sec-Fetch-User": "?1",
+            
+            # 升级不安全请求
+            "Upgrade-Insecure-Requests": "1",
+            
+            # DNT (Do Not Track)
+            "DNT": "1",
+            
+            # 设备内存（较新的浏览器支持）
+            "Device-Memory": "8",
+            
+            # 视口宽度
+            "Viewport-Width": "1920",
+            
+            # 宽度
+            "Width": "1920",
+            
+            # 向下兼容的用户代理
+            "X-Requested-With": "XMLHttpRequest",
+            
+            # 原始来源
+            "Origin": url.split('//')[0] + '//' + url.split('//')[1].split('/')[0]
+        }
+        
+        try:
+            # 获取文件大小
+            head_response = requests.head(url, allow_redirects=True, timeout=10)
+            total_size = int(head_response.headers.get('content-length', 0))
+            
+            # 检查是否支持断点续传
+            accept_ranges = head_response.headers.get('accept-ranges', '').lower() == 'bytes'
+            
+            # 检查已下载的部分
+            downloaded_size = 0
+            if os.path.exists(output_path):
+                downloaded_size = os.path.getsize(output_path)
+                if downloaded_size >= total_size:
+                    self.send_status("MinGW64已下载完成，跳过下载")
+                    self.send_hide_cancel()
+                    return
+                
+                if not accept_ranges:
+                    # 服务器不支持断点续传，需要重新下载
+                    os.remove(output_path)
+                    downloaded_size = 0
+            
+            mode = 'ab' if downloaded_size > 0 and accept_ranges else 'wb'
+            headers = {}
+            if downloaded_size > 0 and accept_ranges:
+                headers['Range'] = f'bytes={downloaded_size}-'
+            
+            # 开始下载
+            with requests.get(url, stream=True, headers=headers, timeout=30) as response:
+                response.raise_for_status()
+                
+                # 如果服务器不支持断点续传但我们已经下载了一部分，需要重新下载
+                if downloaded_size > 0 and not accept_ranges and response.status_code != 206:
+                    downloaded_size = 0
+                    mode = 'wb'
+                
+                with open(output_path, mode) as file:
+                    start_time = time.time()
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if self.download_canceled:
+                            self.send_status("下载已取消")
+                            self.send_hide_cancel()
+                            raise Exception("下载被用户取消")
+                        
+                        if chunk:  # 过滤掉保持连接的新块
+                            file.write(chunk)
+                            downloaded_size += len(chunk)
+                            
+                            # 计算下载速度
+                            elapsed_time = time.time() - start_time
+                            if elapsed_time > 0:
+                                speed = downloaded_size / elapsed_time  # bytes per second
+                                speed_str = f"{speed / 1024 / 1024:.2f} MB/s"
+                                self.send_speed(speed_str)
+                            
+                            # 更新进度
+                            if total_size > 0:
+                                progress = start_progress + (downloaded_size / total_size) * progress_portion
+                                self.send_progress(progress)
+                                self.send_status(f"下载MinGW64: {downloaded_size/1024/1024:.1f}MB / {total_size/1024/1024:.1f}MB")
+            
+            self.send_status("MinGW64下载完成")
+            self.send_hide_cancel()
+            
+        except requests.exceptions.RequestException as e:
+            if self.download_canceled:
+                raise Exception("下载被用户取消")
+            else:
+                raise Exception(f"下载MinGW64失败: {str(e)}")
         except Exception as e:
-            raise Exception(f"无法读取MinGW64资源文件: {str(e)}")
+            if self.download_canceled:
+                raise Exception("下载被用户取消")
+            else:
+                raise Exception(f"下载MinGW64时发生错误: {str(e)}")
     
     def extract_mingw64_archive(self, archive_path, extract_path, progress_portion, start_progress):
         """解压MinGW64压缩包"""
@@ -528,20 +713,20 @@ class Installer:
         
         while retry_count < max_retries:
             try:
-                with py7zr.SevenZipFile(archive_path, mode='r') as archive:
+                with zipfile.ZipFile(archive_path, 'r') as archive:
                     file_list = archive.namelist()
                     total_files = len(file_list)
                     extracted = 0
                     
                     # 先创建所有目录结构
-                    for file_info in archive.files:
-                        if file_info.is_directory:
+                    for file_info in archive.filelist:
+                        if file_info.is_dir():
                             dir_path = os.path.join(extract_path, file_info.filename)
                             os.makedirs(dir_path, exist_ok=True)
                     
                     # 然后提取文件
-                    for file_info in archive.files:
-                        if file_info.is_directory:
+                    for file_info in archive.filelist:
+                        if file_info.is_dir():
                             continue
                             
                         # 尝试解压文件，如果失败则重试
@@ -555,12 +740,9 @@ class Installer:
                                 os.makedirs(target_dir, exist_ok=True)
                                 
                                 # 提取文件
-                                archive.extract(targets=[file_info.filename], path=extract_path)
+                                with archive.open(file_info) as source, open(os.path.join(extract_path, file_info.filename), 'wb') as target:
+                                    shutil.copyfileobj(source, target)
                                 success = True
-                            except py7zr.exceptions.CrcError as e:
-                                # 如果是CRC错误，尝试跳过这个文件
-                                self.send_status(f"警告: 文件 {file_info.filename} CRC校验失败，跳过此文件")
-                                success = True  # 标记为成功以继续处理其他文件
                             except Exception as e:
                                 file_retries += 1
                                 self.send_status(f"解压 {file_info.filename} 失败，重试 {file_retries}/3...")
