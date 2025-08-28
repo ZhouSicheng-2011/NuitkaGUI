@@ -4,18 +4,26 @@ from tkinter import messagebox
 from tkinter import filedialog
 
 import os
-from importlib.resources import files  # Python 3.9+ is required
-import py7zr, py7zr.exceptions
-from win32com.client import Dispatch
 import sys
 import time
 import shutil
-from win32api import SetFileAttributes
-from win32con import FILE_ATTRIBUTE_NORMAL
 import threading
 import queue
 import traceback
 import hashlib
+import tempfile
+import ctypes
+from win32com.client import Dispatch
+from win32api import SetFileAttributes
+from win32con import FILE_ATTRIBUTE_NORMAL
+
+# 尝试导入py7zr，如果失败则提供更友好的错误信息
+try:
+    import py7zr, py7zr.exceptions
+    PY7ZR_AVAILABLE = True
+except ImportError:
+    PY7ZR_AVAILABLE = False
+    messagebox.showerror("缺少依赖", "无法导入py7zr库，请确保已正确安装所有依赖")
 
 class Installer:
     def __init__(self):
@@ -33,10 +41,16 @@ class Installer:
         self.current_step = 0
         self.total_steps = 100
         
-        # 路径设置
+        # 路径设置 - 使用更可靠的方法获取路径
         self.desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-        self.startmenu_path = os.path.join(os.getenv("APPDATA"), "Microsoft", "Windows", "Start Menu", "Programs") # type: ignore
-        self.mingw64_path = f'C:\\Users\\{os.getlogin()}\\AppData\\Local\\Nuitka\\Nuitka\\Cache\\downloads\\gcc\\x86_64\\14.2.0posix-19.1.1-12.0.0-msvcrt-r2'
+        self.startmenu_path = os.path.join(os.getenv("APPDATA", ""), "Microsoft", "Windows", "Start Menu", "Programs")
+        
+        # 使用更可靠的用户名获取方法
+        try:
+            username = os.getlogin()
+        except:
+            username = os.getenv("USERNAME", "UnknownUser")
+        self.mingw64_path = f'C:\\Users\\{username}\\AppData\\Local\\Nuitka\\Nuitka\\Cache\\downloads\\gcc\\x86_64\\14.2.0posix-19.1.1-12.0.0-msvcrt-r2'
         
         # 设置样式
         self.setup_style()
@@ -51,7 +65,10 @@ class Installer:
     
     def setup_style(self):
         self.style = ttk.Style()
-        self.style.theme_use('vista')
+        try:
+            self.style.theme_use('vista')
+        except:
+            pass  # 如果主题不可用，使用默认主题
         self.style.configure("TFrame", background="#f0f0f0")
         self.style.configure("TButton", font=('Consolas', 10), padding=5)
         self.style.configure("TLabel", background="#f0f0f0", font=('Consolas', 10))
@@ -287,8 +304,8 @@ class Installer:
         """准备安装目录和缓存目录"""
         self.send_status("准备安装目录...")
         
-        # 清理缓存目录
-        cache_dir = r'C:\install_cache'
+        # 使用更可靠的缓存目录
+        cache_dir = os.path.join(tempfile.gettempdir(), 'install_cache')
         if os.path.exists(cache_dir):
             try:
                 shutil.rmtree(cache_dir)
@@ -313,7 +330,7 @@ class Installer:
         self.send_status("正在提取应用程序...")
         
         # 获取应用程序压缩包
-        app_7z_path = r'C:\install_cache\app.7z'
+        app_7z_path = os.path.join(tempfile.gettempdir(), 'install_cache', 'app.7z')
         self.get_app_archive(app_7z_path, total_progress * 0.2, start_progress)
         
         # 验证压缩包完整性
@@ -328,21 +345,29 @@ class Installer:
     def get_app_archive(self, output_path, progress_portion, start_progress):
         """获取应用程序压缩包"""
         try:
-            app_resource = files('assets') / 'NuitkaGUI.7z'
-            BLOCK_SIZE = 1024 * 1024  # 1MB
-            FILE_SIZE = 6985023
+            # 确保输出目录存在
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
             
-            with app_resource.open('rb') as source, open(output_path, 'wb') as target:
-                downloaded = 0
-                while True:
-                    data = source.read(BLOCK_SIZE)
-                    if not data:
-                        break
-                    target.write(data)
-                    downloaded += len(data)
-                    # 更新进度
-                    progress = start_progress + (downloaded / FILE_SIZE) * progress_portion
-                    self.send_progress(progress)
+            # 使用更可靠的方法获取资源
+            try:
+                # 尝试从打包的资源中获取
+                import importlib.resources
+                app_resource = importlib.resources.files('assets') / 'NuitkaGUI.7z'
+                with app_resource.open('rb') as source:
+                    content = source.read()
+            except:
+                # 如果失败，尝试从当前目录获取
+                if os.path.exists('NuitkaGUI.7z'):
+                    with open('NuitkaGUI.7z', 'rb') as source:
+                        content = source.read()
+                else:
+                    raise Exception("无法找到应用程序资源文件")
+            
+            # 写入文件
+            with open(output_path, 'wb') as target:
+                target.write(content)
+            
+            self.send_progress(start_progress + progress_portion)
         except Exception as e:
             raise Exception(f"无法读取应用程序资源文件: {str(e)}")
     
@@ -361,10 +386,11 @@ class Installer:
                 raise Exception(f"{archive_name}压缩包为空")
             
             # 尝试打开压缩包验证完整性
-            with py7zr.SevenZipFile(archive_path, 'r') as archive:
-                file_list = archive.namelist()
-                if not file_list:
-                    raise Exception(f"{archive_name}压缩包为空或损坏")
+            if archive_path.endswith('.7z') and PY7ZR_AVAILABLE:
+                with py7zr.SevenZipFile(archive_path, 'r') as archive:
+                    file_list = archive.namelist()
+                    if not file_list:
+                        raise Exception(f"{archive_name}压缩包为空或损坏")
             
             self.send_status(f"{archive_name}压缩包验证成功")
             return True
@@ -381,53 +407,56 @@ class Installer:
         
         while retry_count < max_retries:
             try:
-                with py7zr.SevenZipFile(archive_path, 'r') as archive:
-                    file_list = archive.namelist()
-                    total_files = len(file_list)
-                    extracted = 0
-                    
-                    # 先创建所有目录结构
-                    for file_info in archive.files:
-                        if file_info.is_directory:
-                            dir_path = os.path.join(extract_path, file_info.filename)
-                            os.makedirs(dir_path, exist_ok=True)
-                    
-                    # 然后提取文件
-                    for file_info in archive.files:
-                        if file_info.is_directory:
-                            continue
+                if archive_path.endswith('.7z') and PY7ZR_AVAILABLE:
+                    with py7zr.SevenZipFile(archive_path, 'r') as archive:
+                        file_list = archive.namelist()
+                        total_files = len(file_list)
+                        extracted = 0
+                        
+                        # 先创建所有目录结构
+                        for file_info in archive.files:
+                            if file_info.is_directory:
+                                dir_path = os.path.join(extract_path, file_info.filename)
+                                os.makedirs(dir_path, exist_ok=True)
+                        
+                        # 然后提取文件
+                        for file_info in archive.files:
+                            if file_info.is_directory:
+                                continue
+                                
+                            # 尝试解压文件，如果失败则重试
+                            success = False
+                            file_retries = 0
                             
-                        # 尝试解压文件，如果失败则重试
-                        success = False
-                        file_retries = 0
-                        
-                        while not success and file_retries < 3:
-                            try:
-                                # 确保目标目录存在
-                                target_dir = os.path.dirname(os.path.join(extract_path, file_info.filename))
-                                os.makedirs(target_dir, exist_ok=True)
-                                
-                                # 提取文件
-                                archive.extract(targets=[file_info.filename], path=extract_path)
-                                success = True
-                            except py7zr.exceptions.CrcError as e:
-                                # 如果是CRC错误，尝试跳过这个文件
-                                self.send_status(f"警告: 文件 {file_info.filename} CRC校验失败，跳过此文件")
-                                success = True  # 标记为成功以继续处理其他文件
-                            except Exception as e:
-                                file_retries += 1
-                                self.send_status(f"解压 {file_info.filename} 失败，重试 {file_retries}/3...")
-                                time.sleep(1)  # 等待1秒后重试
-                                
-                                # 如果是最后一次尝试，抛出异常
-                                if file_retries >= 3:
-                                    raise e
-                        
-                        extracted += 1
-                        # 更新进度
-                        progress = start_progress + (extracted / total_files) * progress_portion
-                        self.send_status(f"解压程序文件 {extracted}/{total_files}")
-                        self.send_progress(progress)
+                            while not success and file_retries < 3:
+                                try:
+                                    # 确保目标目录存在
+                                    target_dir = os.path.dirname(os.path.join(extract_path, file_info.filename))
+                                    os.makedirs(target_dir, exist_ok=True)
+                                    
+                                    # 提取文件
+                                    archive.extract(targets=[file_info.filename], path=extract_path)
+                                    success = True
+                                except py7zr.exceptions.CrcError as e:
+                                    # 如果是CRC错误，尝试跳过这个文件
+                                    self.send_status(f"警告: 文件 {file_info.filename} CRC校验失败，跳过此文件")
+                                    success = True  # 标记为成功以继续处理其他文件
+                                except Exception as e:
+                                    file_retries += 1
+                                    self.send_status(f"解压 {file_info.filename} 失败，重试 {file_retries}/3...")
+                                    time.sleep(1)  # 等待1秒后重试
+                                    
+                                    # 如果是最后一次尝试，抛出异常
+                                    if file_retries >= 3:
+                                        raise e
+                            
+                            extracted += 1
+                            # 更新进度
+                            progress = start_progress + (extracted / total_files) * progress_portion
+                            self.send_status(f"解压程序文件 {extracted}/{total_files}")
+                            self.send_progress(progress)
+                else:
+                    raise Exception("不支持的文件格式或缺少py7zr库")
                 
                 # 如果成功解压所有文件，跳出重试循环
                 break
@@ -463,15 +492,18 @@ class Installer:
     
     def create_shortcut(self, target_path, shortcut_path, description='', working_dir='', icon_path=''):
         """创建快捷方式"""
-        shell = Dispatch('WScript.Shell')
-        shortcut = shell.CreateShortCut(shortcut_path)
-        shortcut.Targetpath = target_path
-        shortcut.Description = description
-        if working_dir:
-            shortcut.WorkingDirectory = working_dir
-        if icon_path:
-            shortcut.IconLocation = icon_path
-        shortcut.save()
+        try:
+            shell = Dispatch('WScript.Shell')
+            shortcut = shell.CreateShortCut(shortcut_path)
+            shortcut.Targetpath = target_path
+            shortcut.Description = description
+            if working_dir:
+                shortcut.WorkingDirectory = working_dir
+            if icon_path:
+                shortcut.IconLocation = icon_path
+            shortcut.save()
+        except Exception as e:
+            self.send_status(f"创建快捷方式失败: {str(e)}")
     
     def install_mingw64(self, total_progress, start_progress):
         """安装MinGW64"""
@@ -488,7 +520,7 @@ class Installer:
         self.send_progress(start_progress + total_progress * 0.1)
         
         # 获取MinGW64压缩包
-        mingw_7z_path = r'C:\install_cache\mingw64.7z'
+        mingw_7z_path = os.path.join(tempfile.gettempdir(), 'install_cache', 'mingw64.7z')
         self.get_mingw64_archive(mingw_7z_path, total_progress * 0.2, start_progress)
         
         # 验证压缩包完整性
@@ -503,21 +535,29 @@ class Installer:
     def get_mingw64_archive(self, output_path, progress_portion, start_progress):
         """获取MinGW64压缩包"""
         try:
-            mingw_resource = files('assets') / 'mingw64.7z'
-            BLOCK_SIZE = 1024 * 1024  # 1MB
-            FILE_SIZE = 167169998
+            # 确保输出目录存在
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
             
-            with mingw_resource.open('rb') as source, open(output_path, 'wb') as target:
-                downloaded = 0
-                while True:
-                    data = source.read(BLOCK_SIZE)
-                    if not data:
-                        break
-                    target.write(data)
-                    downloaded += len(data)
-                    # 更新进度
-                    progress = start_progress + (downloaded / FILE_SIZE) * progress_portion
-                    self.send_progress(progress)
+            # 使用更可靠的方法获取资源
+            try:
+                # 尝试从打包的资源中获取
+                import importlib.resources
+                mingw_resource = importlib.resources.files('assets') / 'mingw64.7z'
+                with mingw_resource.open('rb') as source:
+                    content = source.read()
+            except:
+                # 如果失败，尝试从当前目录获取
+                if os.path.exists('mingw64.7z'):
+                    with open('mingw64.7z', 'rb') as source:
+                        content = source.read()
+                else:
+                    raise Exception("无法找到MinGW64资源文件")
+            
+            # 写入文件
+            with open(output_path, 'wb') as target:
+                target.write(content)
+            
+            self.send_progress(start_progress + progress_portion)
         except Exception as e:
             raise Exception(f"无法读取MinGW64资源文件: {str(e)}")
     
@@ -528,53 +568,56 @@ class Installer:
         
         while retry_count < max_retries:
             try:
-                with py7zr.SevenZipFile(archive_path, mode='r') as archive:
-                    file_list = archive.namelist()
-                    total_files = len(file_list)
-                    extracted = 0
-                    
-                    # 先创建所有目录结构
-                    for file_info in archive.files:
-                        if file_info.is_directory:
-                            dir_path = os.path.join(extract_path, file_info.filename)
-                            os.makedirs(dir_path, exist_ok=True)
-                    
-                    # 然后提取文件
-                    for file_info in archive.files:
-                        if file_info.is_directory:
-                            continue
+                if archive_path.endswith('.7z') and PY7ZR_AVAILABLE:
+                    with py7zr.SevenZipFile(archive_path, mode='r') as archive:
+                        file_list = archive.namelist()
+                        total_files = len(file_list)
+                        extracted = 0
+                        
+                        # 先创建所有目录结构
+                        for file_info in archive.files:
+                            if file_info.is_directory:
+                                dir_path = os.path.join(extract_path, file_info.filename)
+                                os.makedirs(dir_path, exist_ok=True)
+                        
+                        # 然后提取文件
+                        for file_info in archive.files:
+                            if file_info.is_directory:
+                                continue
+                                
+                            # 尝试解压文件，如果失败则重试
+                            success = False
+                            file_retries = 0
                             
-                        # 尝试解压文件，如果失败则重试
-                        success = False
-                        file_retries = 0
-                        
-                        while not success and file_retries < 3:
-                            try:
-                                # 确保目标目录存在
-                                target_dir = os.path.dirname(os.path.join(extract_path, file_info.filename))
-                                os.makedirs(target_dir, exist_ok=True)
-                                
-                                # 提取文件
-                                archive.extract(targets=[file_info.filename], path=extract_path)
-                                success = True
-                            except py7zr.exceptions.CrcError as e:
-                                # 如果是CRC错误，尝试跳过这个文件
-                                self.send_status(f"警告: 文件 {file_info.filename} CRC校验失败，跳过此文件")
-                                success = True  # 标记为成功以继续处理其他文件
-                            except Exception as e:
-                                file_retries += 1
-                                self.send_status(f"解压 {file_info.filename} 失败，重试 {file_retries}/3...")
-                                time.sleep(1)  # 等待1秒后重试
-                                
-                                # 如果是最后一次尝试，抛出异常
-                                if file_retries >= 3:
-                                    raise e
-                        
-                        extracted += 1
-                        # 更新进度
-                        progress = start_progress + (extracted / total_files) * progress_portion
-                        self.send_status(f"解压编译器文件 {extracted}/{total_files}")
-                        self.send_progress(progress)
+                            while not success and file_retries < 3:
+                                try:
+                                    # 确保目标目录存在
+                                    target_dir = os.path.dirname(os.path.join(extract_path, file_info.filename))
+                                    os.makedirs(target_dir, exist_ok=True)
+                                    
+                                    # 提取文件
+                                    archive.extract(targets=[file_info.filename], path=extract_path)
+                                    success = True
+                                except py7zr.exceptions.CrcError as e:
+                                    # 如果是CRC错误，尝试跳过这个文件
+                                    self.send_status(f"警告: 文件 {file_info.filename} CRC校验失败，跳过此文件")
+                                    success = True  # 标记为成功以继续处理其他文件
+                                except Exception as e:
+                                    file_retries += 1
+                                    self.send_status(f"解压 {file_info.filename} 失败，重试 {file_retries}/3...")
+                                    time.sleep(1)  # 等待1秒后重试
+                                    
+                                    # 如果是最后一次尝试，抛出异常
+                                    if file_retries >= 3:
+                                        raise e
+                            
+                            extracted += 1
+                            # 更新进度
+                            progress = start_progress + (extracted / total_files) * progress_portion
+                            self.send_status(f"解压编译器文件 {extracted}/{total_files}")
+                            self.send_progress(progress)
+                else:
+                    raise Exception("不支持的文件格式或缺少py7zr库")
                 
                 # 如果成功解压所有文件，跳出重试循环
                 break
@@ -643,7 +686,6 @@ if __name__ == '__main__':
         # 检查是否以管理员权限运行
         if os.name == 'nt':
             try:
-                import ctypes
                 if ctypes.windll.shell32.IsUserAnAdmin() == 0:
                     messagebox.showwarning("权限警告", 
                         "建议以管理员身份运行安装程序，以确保有足够的权限安装文件。\n"
