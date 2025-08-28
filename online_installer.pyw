@@ -667,7 +667,7 @@ class Installer:
         
         try:
             # 获取文件大小
-            head_response = requests.head(url, allow_redirects=True, timeout=10)
+            head_response = requests.head(url, allow_redirects=True, timeout=10, headers=headers)
             total_size = int(head_response.headers.get('content-length', 0))
             
             # 检查是否支持断点续传

@@ -30,21 +30,26 @@ class NuitkaGUI:
         self.root.geometry('1300x900+50+50')
         self.root.resizable(False, False)
 
-        self.theme = 'vista' if platform.system()=='Windows' else 'clam'
+        if platform.system() == 'Windows':
+            self.theme = 'vista'
 
-        self.style = ttk.Style()
-        self.style.theme_use(self.theme)
-        self.style.configure("TNotebook", background="#f0f0f0")
-        self.style.configure("TNotebook.Tab", padding=(5, 5), font=('Consolas', 10))
-        self.style.configure("TFrame", background="#f0f0f0")
-        self.style.configure("TButton", font=('Consolas', 10), padding=5)
-        self.style.configure("TLabel", background="#f0f0f0", font=('Consolas', 10))
-        self.style.configure("TEntry", font=('Consolas', 10))
-        self.style.configure("TCombobox", font=('Consolas', 10))
-        self.style.configure("TCheckbutton", background="#f0f0f0", font=('Consolas', 10))
-        self.style.configure("TRadiobutton", background="#f0f0f0", font=('Consolas', 10))
-        self.style.configure("TListbox", font=('Consolas', 10))
-        #self.style.configure("TSpinbox", font=('Consolas', 10))
+            self.style = ttk.Style()
+            self.style.theme_use(self.theme)
+            self.style.configure("TNotebook", background="#f0f0f0")
+            self.style.configure("TNotebook.Tab", padding=(5, 5), font=('Consolas', 10))
+            self.style.configure("TFrame", background="#f0f0f0")
+            self.style.configure("TButton", font=('Consolas', 10), padding=5)
+            self.style.configure("TLabel", background="#f0f0f0", font=('Consolas', 10))
+            self.style.configure("TEntry", font=('Consolas', 10))
+            self.style.configure("TCombobox", font=('Consolas', 10))
+            self.style.configure("TCheckbutton", background="#f0f0f0", font=('Consolas', 10))
+            self.style.configure("TRadiobutton", background="#f0f0f0", font=('Consolas', 10))
+            self.style.configure("TListbox", font=('Consolas', 10))
+            self.style.configure("TSpinbox", font=('Consolas', 10))
+        
+        elif platform.system() == 'Linux':
+            self.root.tk.call('source', 'Ubuntu_style.tcl')
+            self.root.tk.call('set_theme', 'ubuntu-light')
         
         self.main = ttk.LabelFrame(self.root,labelanchor='nw',text='基础选项')
         self.main.place(x=20,y=20,width=1260,height=160)
