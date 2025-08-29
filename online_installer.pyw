@@ -9,24 +9,42 @@ import time
 import shutil
 import threading
 import queue
-import traceback
-import hashlib
+#import traceback
+#import hashlib
 import requests
 from urllib.parse import urlparse
 import zipfile
 import tempfile
 import ctypes
+import re  # 添加正则表达式支持
+import subprocess  # 添加子进程支持
 from win32com.client import Dispatch
 from win32api import SetFileAttributes
 from win32con import FILE_ATTRIBUTE_NORMAL
 
-# 尝试导入py7zr，如果失败则提供更友好的错误信息
-try:
-    import py7zr, py7zr.exceptions
-    PY7ZR_AVAILABLE = True
-except ImportError:
-    PY7ZR_AVAILABLE = False
-    messagebox.showerror("缺少依赖", "无法导入py7zr库，请确保已正确安装所有依赖")
+# 检查py7zr是否可用
+def init_7z():
+    try:
+        import importlib.resources
+        seven_zip_exe = importlib.resources.files('depend') / '7z.exe'
+        seven_zip_dll = importlib.resources.files('depend') / '7z.dll'
+        os.makedirs(r'C:\install_cache', exist_ok=True)
+        with seven_zip_dll.open('rb') as dll, open(r'C:\install_cache\7z.dll', 'wb') as dll_out:
+            dll_out.write(dll.read())
+        with seven_zip_exe.open('rb') as exe, open(r'C:\install_cache\7z.exe', 'wb') as exe_out:
+            exe_out.write(exe.read())
+
+    except:
+        os.makedirs(r'C:\install_cache', exist_ok=True)
+        if os.path.exists('./depend/7z.exe') and os.path.exists('./depend/7z.dll'):
+            with open('./depend/7z.dll', 'rb') as dll, open(r'C:\install_cache\7z.dll', 'wb') as dll_out:
+                dll_out.write(dll.read())
+            with open('./depend/7z.exe', 'rb') as exe, open(r'C:\install_cache\7z.exe', 'wb') as exe_out:
+                exe_out.write(exe.read())
+        else:
+            raise OSError('抱歉, 安装程序损坏或权限不足, 无法安装!') 
+
+
 
 class Installer:
     def __init__(self):
@@ -44,6 +62,9 @@ class Installer:
         self.current_step = 0
         self.total_steps = 100
         self.download_canceled = False
+        
+        # 7-zip路径设置 - 可以根据需要修改
+        self.seven_zip_path = r"C:\install_cache\7z.exe"
         
         # 路径设置 - 使用更可靠的方法获取路径
         self.desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
@@ -448,25 +469,28 @@ class Installer:
                 raise Exception(f"{archive_name}压缩包为空")
             
             # 尝试打开压缩包验证完整性
-            if archive_path.endswith('.7z') and PY7ZR_AVAILABLE:
-                with py7zr.SevenZipFile(archive_path, 'r') as archive:
-                    file_list = archive.namelist()
-                    if not file_list:
-                        raise Exception(f"{archive_name}压缩包为空或损坏")
-            elif archive_path.endswith('.zip'):
-                with zipfile.ZipFile(archive_path, 'r') as archive:
-                    if archive.testzip() is not None:
-                        raise Exception(f"{archive_name}压缩包损坏")
+            # 使用7-zip命令行工具验证压缩包完整性
+            if os.path.exists(self.seven_zip_path):
+                command = [
+                    self.seven_zip_path, "t", archive_path, "-y"
+                ]
+                process = subprocess.Popen(
+                    command,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                )
+                output, _ = process.communicate()
+                if process.returncode != 0:
+                    raise Exception(f"{archive_name}压缩包损坏或无法验证\n7-zip输出:\n{output}")
+            else:
+                raise OSError('安装包可能损坏')
             
             self.send_status(f"{archive_name}压缩包验证成功")
             return True
             
-        except py7zr.Bad7zFile:
-            raise Exception(f"{archive_name}压缩包损坏，请重新下载安装程序")
-        except zipfile.BadZipFile:
-            raise Exception(f"{archive_name}压缩包损坏，请重新下载")
-        except Exception as e:
-            raise Exception(f"{archive_name}压缩包验证失败: {str(e)}")
+        except:
+            pass
     
     def extract_app_archive(self, archive_path, extract_path, progress_portion, start_progress):
         """解压应用程序压缩包"""
@@ -475,56 +499,12 @@ class Installer:
         
         while retry_count < max_retries:
             try:
-                if archive_path.endswith('.7z') and PY7ZR_AVAILABLE:
-                    with py7zr.SevenZipFile(archive_path, 'r') as archive:
-                        file_list = archive.namelist()
-                        total_files = len(file_list)
-                        extracted = 0
-                        
-                        # 先创建所有目录结构
-                        for file_info in archive.files:
-                            if file_info.is_directory:
-                                dir_path = os.path.join(extract_path, file_info.filename)
-                                os.makedirs(dir_path, exist_ok=True)
-                        
-                        # 然后提取文件
-                        for file_info in archive.files:
-                            if file_info.is_directory:
-                                continue
-                                
-                            # 尝试解压文件，如果失败则重试
-                            success = False
-                            file_retries = 0
-                            
-                            while not success and file_retries < 3:
-                                try:
-                                    # 确保目标目录存在
-                                    target_dir = os.path.dirname(os.path.join(extract_path, file_info.filename))
-                                    os.makedirs(target_dir, exist_ok=True)
-                                    
-                                    # 提取文件
-                                    archive.extract(targets=[file_info.filename], path=extract_path)
-                                    success = True
-                                except py7zr.exceptions.CrcError as e:
-                                    # 如果是CRC错误，尝试跳过这个文件
-                                    self.send_status(f"警告: 文件 {file_info.filename} CRC校验失败，跳过此文件")
-                                    success = True  # 标记为成功以继续处理其他文件
-                                except Exception as e:
-                                    file_retries += 1
-                                    self.send_status(f"解压 {file_info.filename} 失败，重试 {file_retries}/3...")
-                                    time.sleep(1)  # 等待1秒后重试
-                                    
-                                    # 如果是最后一次尝试，抛出异常
-                                    if file_retries >= 3:
-                                        raise e
-                            
-                            extracted += 1
-                            # 更新进度
-                            progress = start_progress + (extracted / total_files) * progress_portion
-                            self.send_status(f"解压程序文件 {extracted}/{total_files}")
-                            self.send_progress(progress)
+                # 尝试使用7-zip命令行工具解压（如果可用）
+                if os.path.exists(self.seven_zip_path):
+                    self.extract_with_7z(archive_path, extract_path, progress_portion, start_progress)
+                
                 else:
-                    raise Exception("不支持的文件格式或缺少py7zr库")
+                    raise Exception("没有可用的解压工具, 安装程序可能损坏")
                 
                 # 如果成功解压所有文件，跳出重试循环
                 break
@@ -537,6 +517,83 @@ class Installer:
                     raise Exception(f"无法解压应用程序文件: {str(e)}")
                 
                 time.sleep(2)  # 等待2秒后重试
+    
+    def extract_with_7z(self, archive_path, extract_path, progress_portion, start_progress):
+        """使用7-zip命令行工具解压文件，并实时显示进度"""
+        max_retries = 3
+        retry_count = 0
+        
+        while retry_count < max_retries:
+            try:
+                # 确保目标目录存在
+                os.makedirs(extract_path, exist_ok=True)
+                
+                # 使用7-zip解压，并捕获输出
+                self.send_status(f"正在解压文件...")
+                
+                # 构建命令 - 添加-bb3参数以获取详细输出
+                command = [
+                    self.seven_zip_path, "x", archive_path, 
+                    f"-o{extract_path}", "-y", "-bb3"
+                ]
+                
+                # 启动子进程并捕获输出
+                process = subprocess.Popen(
+                    command,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,  # 将标准错误重定向到标准输出
+                    universal_newlines=True,
+                    bufsize=1  # 行缓冲
+                )
+                
+                # 实时读取输出并解析进度
+                progress_pattern = re.compile(r'(\d+)%')
+                current_percent = 0
+
+                if process.stdout is not None:
+                    for line in process.stdout:
+                        # 查找进度百分比
+                        match = progress_pattern.search(line)
+                        if match:
+                            new_percent = int(match.group(1))
+                            # 只有当进度有实际变化时才更新
+                            if new_percent != current_percent:
+                                current_percent = new_percent
+                                # 计算当前进度
+                                current_progress = start_progress + (progress_portion * current_percent / 100.0)
+                                self.send_progress(current_progress)
+
+                        # 显示当前正在解压的文件名
+                        if " - " in line and not line.strip().endswith("%"):
+                            # 提取文件名部分
+                            file_part = line.split(" - ")[-1].strip()
+                            if file_part and not file_part.endswith("%"):
+                                self.send_status(f"正在解压: {file_part}")
+                else:
+                    raise Exception("无法读取7-zip输出流，process.stdout为None")
+                
+                # 等待进程结束
+                process.wait()
+                
+                if process.returncode != 0:
+                    raise Exception(f"7-zip解压失败，返回码: {process.returncode}")
+                
+                # 更新进度到完成
+                self.send_progress(start_progress + progress_portion)
+                break
+                
+            except subprocess.TimeoutExpired:
+                retry_count += 1
+                self.send_status(f"解压超时，重试 {retry_count}/{max_retries}...")
+                if retry_count >= max_retries:
+                    raise Exception("解压超时，请检查压缩文件是否完整")
+                time.sleep(2)
+            except Exception as e:
+                retry_count += 1
+                self.send_status(f"解压失败，重试 {retry_count}/{max_retries}...")
+                if retry_count >= max_retries:
+                    raise Exception(f"无法解压文件: {str(e)}")
+                time.sleep(2)
     
     def create_startmenu_shortcut(self, install_path, progress_portion, start_progress):
         """创建开始菜单快捷方式"""
@@ -865,6 +922,8 @@ if __name__ == '__main__':
                         "当前安装可能会因为权限不足而失败。")
             except:
                 pass
+        
+        init_7z()
         
         installer = Installer()
     except Exception as e:
