@@ -212,7 +212,7 @@ __marimo__/
 
 #Ignore the compiled and compressed files
 *.7z
-*.exe
+NuitkaGUI.exe
 #Ignore useless xml file
 *.xml
 
