@@ -31,7 +31,11 @@ class NuitkaGUI:
         self.root.resizable(False, False)
 
         if platform.system() == 'Windows':
-            self.theme = 'vista'
+            self.root.tk.call('source', './styles/Azure-ttk-theme-2.1.0/azure.tcl')
+            self.root.tk.call('set_theme', 'dark') #or:light
+        
+        elif platform.system() == 'Linux':
+            self.theme = 'clam'
 
             self.style = ttk.Style()
             self.style.theme_use(self.theme)
@@ -46,10 +50,6 @@ class NuitkaGUI:
             self.style.configure("TRadiobutton", background="#f0f0f0", font=('Consolas', 10))
             self.style.configure("TListbox", font=('Consolas', 10))
             self.style.configure("TSpinbox", font=('Consolas', 10))
-        
-        elif platform.system() == 'Linux':
-            self.root.tk.call('source', 'Ubuntu_style.tcl')
-            self.root.tk.call('set_theme', 'ubuntu-light')
         
         self.main = ttk.LabelFrame(self.root,labelanchor='nw',text='基础选项')
         self.main.place(x=20,y=20,width=1260,height=160)
@@ -93,21 +93,21 @@ class NuitkaGUI:
 
     def simple(self):
         self.lb_0 = ttk.Label(self.main, text='Python脚本路径:')
-        self.lb_0.grid(column=0, row=0)
+        self.lb_0.grid(column=0, row=0, padx=5, pady=5)
         self.lb_1 = ttk.Label(self.main, text='Python解释器路径:')
-        self.lb_1.grid(column=0, row=1)
+        self.lb_1.grid(column=0, row=1, padx=5, pady=5)
         self.script = tk.StringVar()
         self.interpreter = tk.StringVar()
         self.e_0 = ttk.Entry(self.main, textvariable=self.script, width=130)
         self.e_0.config(state='readonly')
-        self.e_0.grid(column=1, row=0)
+        self.e_0.grid(column=1, row=0, padx=5, pady=5)
         self.e_1 = ttk.Entry(self.main, textvariable=self.interpreter, width=130)
         self.e_1.config(state='readonly')
-        self.e_1.grid(column=1, row=1)
+        self.e_1.grid(column=1, row=1, padx=5, pady=5)
         self.btn_0 = ttk.Button(self.main, text='浏览',command=self.select_script)
-        self.btn_0.grid(column=2, row=0)
+        self.btn_0.grid(column=2, row=0, padx=5, pady=5)
         self.btn_1 = ttk.Button(self.main, text='浏览', command=self.select_interpreter)
-        self.btn_1.grid(column=2,row=1)
+        self.btn_1.grid(column=2,row=1, padx=5, pady=5)
     
     def basic_tab(self):
         self.tab_0 = ttk.Frame(self.notebook)
@@ -145,9 +145,9 @@ class NuitkaGUI:
         self.rbtn_6.pack(anchor='w', fill='y')
         ##
         ##
-        # 展开循环 - 为每个Python标志创建独立的控件和变量
+        # 为每个Python标志创建独立的控件和变量
         self.f_1 = ttk.LabelFrame(self.tab_0, text='Python标志', labelanchor='nw')
-        self.f_1.place(x=620,y=20,width=600,height=280)
+        self.f_1.place(x=620,y=20,width=600,height=380)
         
         # 为每个标志创建独立的IntVar和Checkbutton
         self.var_isolated = tk.IntVar(value=0)
@@ -193,7 +193,7 @@ class NuitkaGUI:
         ##
         ##
         self.f_2 = ttk.Labelframe(self.tab_0, text='调试选项', labelanchor='nw')
-        self.f_2.place(x=620, y=320, width=600,height=200)
+        self.f_2.place(x=620, y=320, width=600,height=150)
         #
         self.py_dbg = tk.IntVar(value=0)
         self.cbtn_0 = ttk.Checkbutton(self.f_2, text='Python Debug', variable=self.py_dbg, offvalue=0, onvalue=1)
@@ -381,42 +381,43 @@ class NuitkaGUI:
         self.onefile_no_compression = tk.BooleanVar(value=False)
         self.cbtn_10 = ttk.Checkbutton(self.tab_3, variable=self.onefile_no_compression,\
                                         offvalue=False, onvalue=True, text='不压缩单文件包')
-        self.cbtn_10.grid(column=0, row=1, sticky='w', columnspan=2)
+        self.cbtn_10.grid(column=0, row=1, sticky='w', columnspan=2, padx=5, pady=5)
         #
         self.onefile_as_archive = tk.BooleanVar(value=False)
         self.cbtn_12 = ttk.Checkbutton(self.tab_3, variable=self.onefile_as_archive,\
                                         offvalue=False, onvalue=True,\
                                             text='创建可以使用nuitka-onefile-unapck解包的归档格式')
-        self.cbtn_12.grid(column=0, row=2, sticky='w', columnspan=2)
+        self.cbtn_12.grid(column=0, row=2, sticky='w', columnspan=2, padx=5, pady=5)
         #
         self.onefile_no_dll = tk.BooleanVar(value=False)
         self.cbtn_14 = ttk.Checkbutton(self.tab_3, variable=self.onefile_no_dll,\
                                         offvalue=False, onvalue=True,\
                                             text='不使用DLL文件在运行之前解压, 使用EXE解压')
-        self.cbtn_14.grid(column=0, row=3, sticky='w', columnspan=2)
+        self.cbtn_14.grid(column=0, row=3, sticky='w', columnspan=2, padx=5, pady=5)
         #
         self.onefile_tempdir_spec = tk.StringVar(value='')
         self.lb_19 = ttk.Label(self.tab_3, text='单文件临时目录:')
-        self.lb_19.grid(column=0, row=4)
+        self.lb_19.grid(column=0, row=4, padx=5, pady=5)
+        
         #
         self.e_16 = ttk.Entry(self.tab_3, textvariable=self.onefile_tempdir_spec, width=100)
-        self.e_16.grid(column=1, row=4, columnspan=4)
+        self.e_16.grid(column=1, row=4, columnspan=4, padx=5, pady=5)
         #
         self.onefile_cache_mode = tk.StringVar(value='auto')
         self.lb_20 = ttk.Label(self.tab_3, text='单文件缓存模式:')
-        self.lb_20.grid(column=0, row=5)
+        self.lb_20.grid(column=0, row=5, padx=5, pady=5)
         #
         self.cbox_4 = ttk.Combobox(self.tab_3, values=['auto','tempdir','userdir'],\
                                       state='readonly', width=20)
         self.cbox_4.bind('<<ComboboxSelected>>', lambda event:self.onefile_cache_mode.set(self.cbox_4.get()))
-        self.cbox_4.grid(column=1, row=5, sticky='w')
+        self.cbox_4.grid(column=1, row=5, sticky='w', padx=5, pady=5)
         #
         self.onefile_child_grace = tk.IntVar(value=5000)
         self.lb_21 = ttk.Label(self.tab_3, text='单文件子进程终止等待时间(毫秒):')
-        self.lb_21.grid(column=0, row=6)
+        self.lb_21.grid(column=0, row=6, padx=5, pady=5)
         #
         self.sbox_1 = ttk.Spinbox(self.tab_3, from_=0, to=30_000, increment=500, textvariable=self.onefile_child_grace)
-        self.sbox_1.grid(column=1, row=6, sticky='w')
+        self.sbox_1.grid(column=1, row=6, sticky='w', padx=5, pady=5)
 
     def data_tab(self):
         self.tab_16 = ttk.Frame(self.notebook)
@@ -743,24 +744,24 @@ class NuitkaGUI:
         #
         self.noinclude_dlls = tk.StringVar(value='')
         self.lb_5 = ttk.Label(self.tab_4, text='不包含DLL列表:')
-        self.lb_5.grid(column=0, row=0, sticky='e')
+        self.lb_5.grid(column=0, row=0, sticky='e', padx=5, pady=5)
         #
         self.e_13 = ttk.Entry(self.tab_4, textvariable=self.noinclude_dlls, width=100)
-        self.e_13.grid(column=1, row=0)
+        self.e_13.grid(column=1, row=0, padx=5, pady=5)
         #
         self.list_package_dlls = tk.StringVar(value='')
         self.lb_17 = ttk.Label(self.tab_4, text='列出包所包含的DLL:')
-        self.lb_17.grid(column=0, row=1, sticky='e')
+        self.lb_17.grid(column=0, row=1, sticky='e', padx=5, pady=5)
         #
         self.e_14 = ttk.Entry(self.tab_4, textvariable=self.list_package_dlls, width=100)
-        self.e_14.grid(column=1, row=1)
+        self.e_14.grid(column=1, row=1, padx=5, pady=5)
         #
         self.list_package_exe = tk.StringVar(value='')
         self.lb_18 = ttk.Label(self.tab_4, text='列出包所包含的EXE:')
-        self.lb_18.grid(column=0, row=2, sticky='e')
+        self.lb_18.grid(column=0, row=2, sticky='e', padx=5, pady=5)
         #
         self.e_15 = ttk.Entry(self.tab_4, textvariable=self.list_package_exe, width=100)
-        self.e_15.grid(column=1, row=2)
+        self.e_15.grid(column=1, row=2, padx=5, pady=5)
 
     def warn_tab(self):
         self.tab_5 = ttk.Frame(self.notebook)
@@ -769,26 +770,26 @@ class NuitkaGUI:
         self.warn_implicit_exception = tk.BooleanVar(value=False)
         self.cbtn_13 = ttk.Checkbutton(self.tab_5, variable=self.warn_implicit_exception,\
                                        offvalue=False, onvalue=True, text='启用编译时隐式异常警告')
-        self.cbtn_13.grid(column=0, row=0, sticky='w', columnspan=2)
+        self.cbtn_13.grid(column=0, row=0, sticky='w', columnspan=2, padx=5, pady=5)
         #
         self.warn_unusual_code = tk.BooleanVar(value=False)
         self.cbtn_14 = ttk.Checkbutton(self.tab_5, variable=self.warn_unusual_code,\
                                        offvalue=False, onvalue=True, text='启用编译时检测到的异常代码警告')
-        self.cbtn_14.grid(column=0, row=1, sticky='w', columnspan=2)
+        self.cbtn_14.grid(column=0, row=1, sticky='w', columnspan=2, padx=5, pady=5)
         #
         self.assume_yes_for_downloads = tk.BooleanVar(value=True)
         self.cbtn_15 = ttk.Checkbutton(self.tab_5, variable=self.assume_yes_for_downloads,
                                        #command=self.disable_or_enable_download,\
                                        offvalue=False, onvalue=True, text='允许Nuitka在必要时下载外部代码(主要是编译器及其依赖)(⚠警告:不要轻易禁用)')
         ###self.cbtn_15.bind('<<Toggled>>', lambda event:self.disable_or_enable_download())
-        self.cbtn_15.grid(column=0, row=2, sticky='w', columnspan=2)
+        self.cbtn_15.grid(column=0, row=2, sticky='w', columnspan=2, padx=5, pady=5)
         #
         self.nowarn_mnemonic = tk.StringVar(value='')
         self.lb_13 = ttk.Label(self.tab_5, text='禁用特定助记符的警告:')
-        self.lb_13.grid(column=0, row=3)
+        self.lb_13.grid(column=0, row=3, padx=5, pady=5)
         #
         self.e_11 = ttk.Entry(self.tab_5, textvariable=self.nowarn_mnemonic)
-        self.e_11.grid(column=1, row=3)
+        self.e_11.grid(column=1, row=3, padx=5, pady=5)
 
     def run_tab(self):
         self.tab_6 = ttk.Frame(self.notebook)
@@ -811,34 +812,34 @@ class NuitkaGUI:
         self.full_compat = tk.BooleanVar(value=False)
         self.cbtn_16 = ttk.Checkbutton(self.tab_7, variable=self.full_compat, offvalue=False,\
                                        onvalue=True, text='启用完全兼容CPython模式(测试)')
-        self.cbtn_16.grid(column=0, row=0, sticky='w', columnspan=2)
+        self.cbtn_16.grid(column=0, row=0, sticky='w', columnspan=2, padx=5, pady=5)
         #
         self.lb_14 = ttk.Label(self.tab_7, text='选择__file__变量的值:')
-        self.lb_14.grid(column=0, row=1, sticky='e')
+        self.lb_14.grid(column=0, row=1, sticky='e', padx=5, pady=5)
         self.file_reference_choice = tk.StringVar(value='')
         self.cbox_2 = ttk.Combobox(self.tab_7, values=['runtime','original','frozen'],\
                                    state='readonly', width=20)
         self.cbox_2.bind('<<ComboboxSelected>>', lambda event:self.file_reference_choice.set(self.cbox_2.get()))
-        self.cbox_2.grid(column=1, row=1, sticky='w')
+        self.cbox_2.grid(column=1, row=1, sticky='w', padx=5, pady=5)
         #
         self.lb_15 = ttk.Label(self.tab_7, text='选择__name__变量和__package__变量的值:')
-        self.lb_15.grid(column=0, row=2, sticky='e')
+        self.lb_15.grid(column=0, row=2, sticky='e', padx=5, pady=5)
         self.module_name_choice = tk.StringVar(value='')
         self.cbox_3 = ttk.Combobox(self.tab_7, values=['runtime', 'original'],\
                                     state='readonly', width=20)
         self.cbox_3.bind('<<ComboboxSelected>>', lambda event:self.module_name_choice.set(self.cbox_3.get()))
-        self.cbox_3.grid(column=1, row=2, sticky='w')
+        self.cbox_3.grid(column=1, row=2, sticky='w', padx=5, pady=5)
         #
         self.user_package_configuration = tk.StringVar(value='')
         self.lb_16 = ttk.Label(self.tab_7, text='用户包配置YAML文件路径:')
-        self.lb_16.grid(column=0, row=3)
+        self.lb_16.grid(column=0, row=3, padx=5, pady=5)
         #
         self.e_12 = ttk.Entry(self.tab_7, textvariable=self.user_package_configuration,\
                               width=100, state='readonly')
-        self.e_12.grid(column=1, row=3, columnspan=5)
+        self.e_12.grid(column=1, row=3, columnspan=5, padx=5, pady=5)
         #
         self.btn_13 = ttk.Button(self.tab_7, text='浏览', command=self.select_yaml_file)
-        self.btn_13.grid(column=6, row=3)
+        self.btn_13.grid(column=6, row=3, padx=5, pady=5)
 
     def output_tab(self):
         self.tab_8 = ttk.Frame(self.notebook)
@@ -847,29 +848,29 @@ class NuitkaGUI:
         self.remove_output = tk.IntVar(value=1)
         self.cbtn_9 = ttk.Checkbutton(self.tab_8, text='编译完成后删除中间文件',\
                                       variable=self.remove_output, offvalue=0, onvalue=1)
-        self.cbtn_9.grid(column=0, row=0, columnspan=2, sticky='w')
+        self.cbtn_9.grid(column=0, row=0, columnspan=2, sticky='w', padx=5, pady=5)
         #
         self.no_pyi_file = tk.IntVar(value=0)
         self.cbtn_10 = ttk.Checkbutton(self.tab_8, variable=self.no_pyi_file, offvalue=0,\
                                        onvalue=1, text='不为扩展模块创建pyi文件')
-        self.cbtn_10.grid(column=0, row=1, columnspan=2, sticky='w')
+        self.cbtn_10.grid(column=0, row=1, columnspan=2, sticky='w', padx=5, pady=5)
         #
         self.lb_11 = ttk.Label(self.tab_8, text='可执行文件名:')
-        self.lb_11.grid(column=0, row=3)
+        self.lb_11.grid(column=0, row=3, padx=5, pady=5)
         #
         self.output_filename = tk.StringVar(value='')
         self.e_9 = ttk.Entry(self.tab_8, textvariable=self.output_filename, width=100)
-        self.e_9.grid(column=1, row=3, columnspan=2)
+        self.e_9.grid(column=1, row=3, columnspan=2, padx=5, pady=5)
         ##
         self.lb_12 = ttk.Label(self.tab_8, text='输出文件目录:')
-        self.lb_12.grid(column=0, row=4)
+        self.lb_12.grid(column=0, row=4, padx=5, pady=5)
         #
         self.output_dir = tk.StringVar(value='')
         self.e_10 = ttk.Entry(self.tab_8, textvariable=self.output_dir, width=100)
-        self.e_10.grid(column=1, row=4, columnspan=2)
+        self.e_10.grid(column=1, row=4, columnspan=2, padx=5, pady=5)
         #
         self.btn_12 = ttk.Button(self.tab_8, text='浏览', command=self.select_save_dir)
-        self.btn_12.grid(column=3, row=4)
+        self.btn_12.grid(column=3, row=4, padx=5, pady=5)
 
     def deployment_tab(self):
         self.tab_9 = ttk.Frame(self.notebook)
@@ -878,19 +879,19 @@ class NuitkaGUI:
         self.deployment = tk.IntVar(value=0)
         self.rbtn_7 = ttk.Radiobutton(self.tab_9, text='禁用使查找兼容性问题更容易的代码',\
                                       value=2, variable=self.deployment)
-        self.rbtn_7.grid(column=0, row=0, sticky='w')
+        self.rbtn_7.grid(column=0, row=0, sticky='w', padx=5, pady=5)
         #
         self.rbtn_8 = ttk.Radiobutton(self.tab_9, variable=self.deployment, value=1,\
                                       text='保持部署模式但禁用部分功能')
-        self.rbtn_8.grid(column=0, row=1, sticky='w')
+        self.rbtn_8.grid(column=0, row=1, sticky='w', padx=5, pady=5)
 
         self.lb_7 = ttk.Label(self.tab_9, text='禁用选项')
-        self.lb_7.grid(column=0, row=2)
+        self.lb_7.grid(column=0, row=2, padx=5, pady=5)
 
         self.no_deployment_flag = tk.StringVar()
         self.e_6 = ttk.Entry(self.tab_9, textvariable=self.no_deployment_flag)
         #self.e_6.config(state='disabled')
-        self.e_6.grid(column=1, row=2, sticky='w')
+        self.e_6.grid(column=1, row=2, sticky='w', padx=5, pady=5)
 
         self.rbtn_8.bind('<<RadioButtonSelected>>', lambda event:self.e_6.config(state='normal'))
         self.rbtn_7.bind('<<RadioButtonSelected>>', lambda event:self.e_6.config(state='disabled'))
@@ -927,19 +928,19 @@ class NuitkaGUI:
         self.f_11.place(x=20, y=200, width=1220, height=200)
         #
         self.lb_6 = ttk.Label(self.f_11, text='将优化结果与程序结构写入的XML文件:')
-        self.lb_6.grid(column=0, row=0)
+        self.lb_6.grid(column=0, row=0, padx=5, pady=5)
         #
         self.xml_filename = tk.StringVar()
         self.e_5 = ttk.Entry(self.f_11, textvariable=self.xml_filename, width=70)
-        self.e_5.grid(column=1, row=0)
+        self.e_5.grid(column=1, row=0, padx=5, pady=5)
         #
         self.btn_7 = ttk.Button(self.f_11, text='浏览', command=self.select_xml)
-        self.btn_7.grid(column=2, row=0)
+        self.btn_7.grid(column=2, row=0, padx=5, pady=5)
         #
         self.low_memory = tk.IntVar(value=0)
         self.cbtn_7 = ttk.Checkbutton(self.f_11, variable=self.low_memory, offvalue=0,\
                                       onvalue=1, text='降低内存用量')
-        self.cbtn_7.grid(column=0, row=2, sticky='w')
+        self.cbtn_7.grid(column=0, row=2, sticky='w', padx=5, pady=5)
 
     def C_compiler_tab(self):
         self.tab_11 = ttk.Frame(self.notebook)
@@ -967,38 +968,38 @@ class NuitkaGUI:
         self.f_13.place(x=20, y=300, width=1220, height=260)
         #
         self.lb_8 = ttk.Label(self.f_13, text='并行编译作业数')
-        self.lb_8.grid(column=0, row=0, sticky='w')
+        self.lb_8.grid(column=0, row=0, sticky='w', padx=5, pady=5)
         #self.jobs_values = ...
         self.jobs = tk.StringVar(value='auto')
         self.cbox_5 = ttk.Combobox(self.f_13, values=['auto', '1', '2', '4', '8', '16'])
         self.cbox_5.bind('<<ComboboxSelected>>', lambda e: self.jobs.set(self.cbox_5.get()))
-        self.cbox_5.grid(column=1, row=0)
+        self.cbox_5.grid(column=1, row=0, padx=5, pady=5)
         #
         self.lb_9 = ttk.Label(self.f_13, text='链接时优化(可进一步防反汇编)')
-        self.lb_9.grid(column=0, row=2, sticky='w')
+        self.lb_9.grid(column=0, row=2, sticky='w', padx=5, pady=5)
         #
         self.lto = tk.StringVar(value='yes')
         self.cbox_1 = ttk.Combobox(self.f_13, values=['yes','no','auto'], state='readonly', width=19)
         self.cbox_1.bind('<<ComboboxSelected>>', lambda event:self.lto.set(self.cbox_1.get()))
-        self.cbox_1.grid(column=1, row=2)
+        self.cbox_1.grid(column=1, row=2, padx=5, pady=5)
         ##
         self.static_libpython = tk.StringVar(value='auto')
         #
         self.lb_31 = ttk.Label(self.f_13, text='静态链接Python库')
-        self.lb_31.grid(column=0, row=3)
+        self.lb_31.grid(column=0, row=3, padx=5, pady=5)
         #
         self.cbox_6 = ttk.Combobox(self.f_13, values=['auto', 'yes', 'no'], state='readonly', width=19)
         self.cbox_6.bind('<<ComboboxSelected>>', lambda e:self.static_libpython.set(self.cbox_6.get()))
-        self.cbox_6.grid(column=1, row=3)
+        self.cbox_6.grid(column=1, row=3, padx=5, pady=5)
         ##
         self.cf_protection = tk.StringVar(value='auto')
         #
         self.lb_32 = ttk.Label(self.f_13, text='GCC的cf-protection模式(如auto, none)')
-        self.lb_32.grid(column=0, row=4)
+        self.lb_32.grid(column=0, row=4, padx=5, pady=5)
         #
         self.cbox_7 = ttk.Combobox(self.f_13, values=['auto', 'none'], width=19)
         self.cbox_7.bind('<<ComboboxSelected>>', lambda e:self.cf_protection.set(self.cbox_7.get()))
-        self.cbox_7.grid(column=1, row=4)
+        self.cbox_7.grid(column=1, row=4, padx=5, pady=5)
 
     def OS_tab(self):
         self.tab_12 = ttk.Frame(self.notebook)
@@ -1079,14 +1080,14 @@ class NuitkaGUI:
         self.f_18.place(x=20, y=400, width=1220, height=100)
         #
         self.lb_2 = ttk.Label(self.f_18, text='Linux单文件图标:')
-        self.lb_2.grid(column=0, row=0)
+        self.lb_2.grid(column=0, row=0, padx=5, pady=5)
         #
         self.linux_icon = tk.StringVar(value='')
         self.e_8 = ttk.Entry(self.f_18, textvariable=self.linux_icon, width=100, state='readonly')
-        self.e_8.grid(column=1, row=0)
+        self.e_8.grid(column=1, row=0, pady=5, padx=5)
         #
         self.btn_11 = ttk.Button(self.f_18, text='浏览', command=self.select_ico)
-        self.btn_11.grid(column=2, row=0)
+        self.btn_11.grid(column=2, row=0, padx=5, pady=5)
 
     def info_tab(self):
         self.tab_13 = ttk.Frame(self.notebook)
@@ -1295,14 +1296,14 @@ transformers Transformers 支持：为 transformers 包提供隐式导入。
         self.f_8 = ttk.Labelframe(self.tab_14, text='用户插件', labelanchor='nw')
         self.f_8.place(x=20, y=240, width=1220, height=100)
         self.lb_5 = ttk.Label(self.f_8, text='用户插件路径')
-        self.lb_5.grid(column=0, row=0)
+        self.lb_5.grid(column=0, row=0, padx=5, pady=5)
         #
         self.user_plugin = tk.StringVar(value='')
         self.e_4 = ttk.Entry(self.f_8, textvariable=self.user_plugin, width=100)
-        self.e_4.grid(column=1, columnspan=2, row=0)
+        self.e_4.grid(column=1, columnspan=2, row=0, padx=5, pady=5)
         #
         self.btn_6 = ttk.Button(self.f_8, text='浏览', command=self.browse_user_plugin)
-        self.btn_6.grid(column=3, row=0)
+        self.btn_6.grid(column=3, row=0, padx=5, pady=5)
         ##
         ##
         self.f_9 = ttk.Labelframe(self.tab_14, text='标准插件帮助', labelanchor='nw')
