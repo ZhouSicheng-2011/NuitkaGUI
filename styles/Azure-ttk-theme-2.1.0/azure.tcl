@@ -28,7 +28,7 @@ proc set_theme {mode} {
             -insertcolor $colors(-fg) \
             -insertwidth 1 \
             -fieldbackground $colors(-selectbg) \
-            -font {"Consolas" 10} \
+            -font {"Cascadia Code" 10} \
             -borderwidth 1 \
             -relief flat
 
@@ -67,7 +67,7 @@ proc set_theme {mode} {
             -insertcolor $colors(-fg) \
             -insertwidth 1 \
             -fieldbackground $colors(-selectbg) \
-            -font {"Consolas" 10} \
+            -font {"Cascadia Code" 10} \
             -borderwidth 1 \
             -relief flat
 

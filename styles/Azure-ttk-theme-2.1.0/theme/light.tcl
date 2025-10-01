@@ -507,7 +507,7 @@ namespace eval ttk::theme::azure-light {
             image [list $I(tab-disabled) \
                 selected $I(tab-basic) \
                 active $I(tab-hover) \
-            ] -border 5 -padding {14 4}
+            ] -border 5 -padding {8 8}
 
         # Treeview
         ttk::style element create Treeview.field image $I(card) \
